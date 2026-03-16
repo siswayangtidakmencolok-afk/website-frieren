@@ -420,3 +420,64 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeModal();
 });
 // ===== END JIKAN API =====
+
+// ============================================================
+// TAMBAH DI PALING BAWAH script.js
+// ============================================================
+
+// ── CHARACTER TABS ──
+(function initCharTabs() {
+    const tabs  = document.querySelectorAll('.char-tab');
+    const panels= document.querySelectorAll('.char-panel');
+    if (!tabs.length) return;
+
+    function activateTab(charKey) {
+        tabs.forEach(t => t.classList.toggle('active', t.dataset.char === charKey));
+        panels.forEach(p => {
+            const isTarget = p.dataset.panel === charKey;
+            p.classList.toggle('active', isTarget);
+            if (isTarget) animateBars(p);
+        });
+    }
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => activateTab(tab.dataset.char));
+    });
+
+    // Animate bars on first visible panel
+    animateBars(document.querySelector('.char-panel.active'));
+})();
+
+// ── ANIMATE POWER BARS ──
+function animateBars(panel) {
+    if (!panel) return;
+    // Reset first
+    panel.querySelectorAll('.cpb-fill').forEach(fill => {
+        fill.classList.remove('animated');
+    });
+    // Trigger reflow then animate
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            panel.querySelectorAll('.cpb-fill').forEach((fill, i) => {
+                setTimeout(() => fill.classList.add('animated'), i * 80);
+            });
+        }, 50);
+    });
+}
+
+// ── TIMELINE SCROLL REVEAL ──
+(function initTimeline() {
+    const items = document.querySelectorAll('.tl-item');
+    if (!items.length) return;
+
+    const obs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                obs.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.2, rootMargin: '0px 0px -60px 0px' });
+
+    items.forEach(item => obs.observe(item));
+})();

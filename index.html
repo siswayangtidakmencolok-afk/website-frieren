@@ -93,125 +93,550 @@
         </div>
     </section>
 
-    <section class="characters-section" id="personagens">
+    <!-- ============================================================
+     GANTI SELURUH <section class="characters-section"> YANG LAMA
+     DENGAN BLOK INI
+     ============================================================ -->
+
+<section class="characters-section" id="personagens">
+
+    <div class="cs-header">
+        <p class="cs-eyebrow">✦ Mereka yang Berjalan Bersama</p>
         <h2 class="section-title">Karakter Utama</h2>
-        
-        <div class="characters-slider" id="charactersSlider">
-            
-            <div class="character-card">
-                <div class="character-image">
-                    <img src="images/character-frieren.png" alt="Frieren">
+        <p class="cs-subtitle">
+            Setiap orang yang bertemu Frieren meninggalkan jejak —
+            bahkan mereka yang telah lama tiada.
+        </p>
+    </div>
+
+    <!-- TAB NAVIGATION -->
+    <div class="char-tabs" id="charTabs">
+        <button class="char-tab active" data-char="frieren">Frieren</button>
+        <button class="char-tab" data-char="himmel">Himmel</button>
+        <button class="char-tab" data-char="heiter">Heiter</button>
+        <button class="char-tab" data-char="eisen">Eisen</button>
+        <button class="char-tab" data-char="fern">Fern</button>
+        <button class="char-tab" data-char="stark">Stark</button>
+    </div>
+
+    <!-- CHARACTER SHOWCASE -->
+    <div class="char-showcase" id="charShowcase">
+
+        <!-- ── FRIEREN ── -->
+        <div class="char-panel active" data-panel="frieren">
+            <div class="char-panel-left">
+                <div class="char-portrait-wrap">
+                    <img src="images/character-frieren.png" alt="Frieren" class="char-portrait-img">
+                    <div class="char-portrait-glow" style="--glow-color: rgba(94,236,255,0.25)"></div>
                 </div>
-                <div class="character-info">
-                    <h3>Frieren</h3>
-                    <p>Penyihir Elf yang mencari pemahaman tentang waktu dan perasaan manusia.</p>
-                    <div class="character-tags">
-                        <span class="tag">Mage</span>
-                        <span class="tag">Elf</span>
-                        <span class="tag">Immortal</span>
+                <div class="char-quick-stats">
+                    <div class="qs-item">
+                        <span class="qs-label">Ras</span>
+                        <span class="qs-val">Elf</span>
+                    </div>
+                    <div class="qs-item">
+                        <span class="qs-label">Usia</span>
+                        <span class="qs-val">~1000+</span>
+                    </div>
+                    <div class="qs-item">
+                        <span class="qs-label">Peran</span>
+                        <span class="qs-val">Penyihir</span>
+                    </div>
+                    <div class="qs-item">
+                        <span class="qs-label">Guru</span>
+                        <span class="qs-val">Flamme</span>
                     </div>
                 </div>
             </div>
-
-            <div class="character-card">
-                <div class="character-image">
-                    <img src="images/character-fern.png" alt="Fern">
+            <div class="char-panel-right">
+                <div class="char-name-block">
+                    <div class="char-rune">フリーレン</div>
+                    <h3 class="char-fullname">Frieren</h3>
+                    <p class="char-title-tag">Penyihir dari Kelompok Pahlawan</p>
                 </div>
-                <div class="character-info">
-                    <h3>Fern</h3>
-                    <p>Murid setia Frieren yang memiliki bakat luar biasa dalam sihir deteksi.</p>
-                    <div class="character-tags">
-                        <span class="tag">Mage</span>
-                        <span class="tag">Human</span>
-                        <span class="tag">Prodigy</span>
+
+                <blockquote class="char-quote">
+                    "Aku menyesal tidak meluangkan lebih banyak waktu untuk mengenalnya."
+                </blockquote>
+
+                <p class="char-lore">
+                    Frieren adalah penyihir elf yang telah hidup lebih dari seribu tahun.
+                    Bagi elf, sepuluh tahun bersama kelompok Himmel hanyalah sekejap —
+                    tapi saat Himmel meninggal di usia tua, untuk pertama kalinya
+                    Frieren menangis. Ia baru menyadari: ia tidak pernah benar-benar
+                    mengenal orang yang telah bersamanya selama satu dekade.
+                    Perjalanan barunya bukan untuk mengalahkan musuh, melainkan
+                    untuk memahami apa arti "mengenal seseorang" sebelum waktu
+                    merenggut mereka satu per satu.
+                </p>
+
+                <div class="char-power-bars">
+                    <div class="cpb-row">
+                        <span class="cpb-label">Kekuatan Sihir</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:97%; --color:#5eecff"></div></div>
+                        <span class="cpb-num">97</span>
+                    </div>
+                    <div class="cpb-row">
+                        <span class="cpb-label">Kecepatan Belajar</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:95%; --color:#a78bfa"></div></div>
+                        <span class="cpb-num">95</span>
+                    </div>
+                    <div class="cpb-row">
+                        <span class="cpb-label">Kontrol Mana</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:99%; --color:#5eecff"></div></div>
+                        <span class="cpb-num">99</span>
+                    </div>
+                    <div class="cpb-row">
+                        <span class="cpb-label">Emosi</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:30%; --color:#ec4899"></div></div>
+                        <span class="cpb-num">30</span>
                     </div>
                 </div>
-            </div>
 
-            <div class="character-card">
-                <div class="character-image">
-                    <img src="images/character-himmel.png" alt="Himmel">
-                </div>
-                <div class="character-info">
-                    <h3>Himmel</h3>
-                    <p>Pahlawan legendaris yang menginspirasi Frieren melalui kebaikannya.</p>
-                    <div class="character-tags">
-                        <span class="tag">Hero</span>
-                        <span class="tag">Swordsman</span>
-                        <span class="tag">Legend</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="character-card">
-                <div class="character-image">
-                    <img src="images/character-stark.png" alt="Stark">
-                </div>
-                <div class="character-info">
-                    <h3>Stark</h3>
-                    <p>Pejuang berbakat yang mewarisi kekuatan besar dari masternya, Eisen.</p>
-                    <div class="character-tags">
-                        <span class="tag">Warrior</span>
-                        <span class="tag">Human</span>
-                        <span class="tag">Strong</span>
-                    </div>
+                <div class="char-trait-chips">
+                    <span class="trait-chip">Melankolis</span>
+                    <span class="trait-chip">Penyendiri</span>
+                    <span class="trait-chip">Penyuka Mantra Aneh</span>
+                    <span class="trait-chip">Tidur Banyak</span>
+                    <span class="trait-chip">Lembut di Dalam</span>
                 </div>
             </div>
         </div>
-        
-        <div class="slider-controls">
-            <button class="slider-btn prev" id="prevBtn" aria-label="Slide Sebelumnya">❮</button>
-            <button class="slider-btn next" id="nextBtn" aria-label="Slide Selanjutnya">❯</button>
-        </div>
-        
-        <div class="slider-dots" id="sliderDots"></div>
-    </section>
 
-    <section class="gallery-section" id="galeria">
-        <h2 class="section-title">Galeri Moments Kebersamaan</h2>
-        <div class="gallery-grid">
-            
-            <div class="gallery-item">
-                <img src="images/gallery1.jpg" alt="Himmel dan Frieren di Padang Bunga">
-                <div class="gallery-overlay">
-                    <h3>Kenangan Bersama Himmel</h3>
-                    <p>Momen berharga di padang bunga biru.</p>
+        <!-- ── HIMMEL ── -->
+        <div class="char-panel" data-panel="himmel">
+            <div class="char-panel-left">
+                <div class="char-portrait-wrap">
+                    <img src="images/character-himmel.png" alt="Himmel" class="char-portrait-img">
+                    <div class="char-portrait-glow" style="--glow-color: rgba(251,191,36,0.25)"></div>
+                </div>
+                <div class="char-quick-stats">
+                    <div class="qs-item">
+                        <span class="qs-label">Ras</span>
+                        <span class="qs-val">Manusia</span>
+                    </div>
+                    <div class="qs-item">
+                        <span class="qs-label">Status</span>
+                        <span class="qs-val">Almarhum</span>
+                    </div>
+                    <div class="qs-item">
+                        <span class="qs-label">Peran</span>
+                        <span class="qs-val">Pahlawan</span>
+                    </div>
+                    <div class="qs-item">
+                        <span class="qs-label">Senjata</span>
+                        <span class="qs-val">Pedang</span>
+                    </div>
                 </div>
             </div>
-            
-            <div class="gallery-item">
-                <img src="images/gallery2.jpg" alt="Kelompok Petualang Frieren">
-                <div class="gallery-overlay">
-                    <h3>Tim Petualang</h3>
-                    <p>Perjalanan melintasi benua utara.</p>
+            <div class="char-panel-right">
+                <div class="char-name-block">
+                    <div class="char-rune">ヒンメル</div>
+                    <h3 class="char-fullname" style="color:#fbbf24">Himmel</h3>
+                    <p class="char-title-tag">Pahlawan yang Mengalahkan Raja Iblis</p>
                 </div>
-            </div>
-            
-            <div class="gallery-item">
-                <img src="images/gallery3.jpg" alt="Stark dan Fern">
-                <div class="gallery-overlay">
-                    <h3>Duo Muda</h3>
-                    <p>Kisah pertumbuhan Stark dan Fern.</p>
-                </div>
-            </div>
-            
-            <div class="gallery-item">
-                <img src="images/gallery4.jpg" alt="Adegan Ikonik">
-                <div class="gallery-overlay">
-                    <h3>Momen Emosional</h3>
-                    <p>Pertemuan kembali di alam mimpi.</p>
-                </div>
-            </div>
 
-            <div class="gallery-item">
-                <img src="images/gallery5.jpg" alt="Adegan Ikonik">
-                <div class="gallery-overlay">
-                    <h3>Pelukan hangat himmmel</h3>
-                    <p>Momen yang tak terlupakan bermesraan .</p>
+                <blockquote class="char-quote" style="border-color:rgba(251,191,36,0.4)">
+                    "Menjadi pahlawan itu bukan tentang dikenang. Tapi tentang melakukan
+                    hal yang benar — bahkan saat tidak ada yang melihat."
+                </blockquote>
+
+                <p class="char-lore">
+                    Himmel bukan sekadar pahlawan dalam pengertian literal — ia adalah
+                    bukti bahwa manusia yang hidupnya singkat bisa meninggalkan kenangan
+                    yang abadi melampaui usia seorang elf. Ia tahu umurnya terbatas,
+                    tapi tidak pernah menjadikannya alasan untuk tidak bertindak.
+                    Patungnya tersebar di seluruh dunia — bukan karena ia meminta,
+                    tapi karena orang-orang yang ditolongnya tidak punya cara lain
+                    untuk mengungkapkan terima kasih. Bagi Frieren, Himmel adalah
+                    orang yang paling ia sesali tidak pernah benar-benar mengenal.
+                </p>
+
+                <div class="char-power-bars">
+                    <div class="cpb-row">
+                        <span class="cpb-label">Kekuatan Pedang</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:92%; --color:#fbbf24"></div></div>
+                        <span class="cpb-num">92</span>
+                    </div>
+                    <div class="cpb-row">
+                        <span class="cpb-label">Karisma</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:99%; --color:#fbbf24"></div></div>
+                        <span class="cpb-num">99</span>
+                    </div>
+                    <div class="cpb-row">
+                        <span class="cpb-label">Keberanian</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:98%; --color:#f97316"></div></div>
+                        <span class="cpb-num">98</span>
+                    </div>
+                    <div class="cpb-row">
+                        <span class="cpb-label">Kesombongan Positif</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:88%; --color:#fbbf24"></div></div>
+                        <span class="cpb-num">88</span>
+                    </div>
+                </div>
+
+                <div class="char-trait-chips">
+                    <span class="trait-chip" style="border-color:rgba(251,191,36,0.3);color:#fbbf24">Mulia</span>
+                    <span class="trait-chip" style="border-color:rgba(251,191,36,0.3);color:#fbbf24">Karismatik</span>
+                    <span class="trait-chip" style="border-color:rgba(251,191,36,0.3);color:#fbbf24">Narsis (Tapi Benar)</span>
+                    <span class="trait-chip" style="border-color:rgba(251,191,36,0.3);color:#fbbf24">Ikhlas</span>
+                    <span class="trait-chip" style="border-color:rgba(251,191,36,0.3);color:#fbbf24">Legendaris</span>
                 </div>
             </div>
         </div>
-    </section>
+
+        <!-- ── HEITER ── -->
+        <div class="char-panel" data-panel="heiter">
+            <div class="char-panel-left">
+                <div class="char-portrait-wrap">
+                    <img src="images/character-heiter.png" alt="Heiter" class="char-portrait-img" onerror="this.style.opacity='0.3'">
+                    <div class="char-portrait-glow" style="--glow-color: rgba(250,204,21,0.2)"></div>
+                </div>
+                <div class="char-quick-stats">
+                    <div class="qs-item"><span class="qs-label">Ras</span><span class="qs-val">Manusia</span></div>
+                    <div class="qs-item"><span class="qs-label">Status</span><span class="qs-val">Almarhum</span></div>
+                    <div class="qs-item"><span class="qs-label">Peran</span><span class="qs-val">Pendeta</span></div>
+                    <div class="qs-item"><span class="qs-label">Murid</span><span class="qs-val">Fern</span></div>
+                </div>
+            </div>
+            <div class="char-panel-right">
+                <div class="char-name-block">
+                    <div class="char-rune">ハイター</div>
+                    <h3 class="char-fullname" style="color:#facc15">Heiter</h3>
+                    <p class="char-title-tag">Pendeta Agung yang Membesarkan Fern</p>
+                </div>
+                <blockquote class="char-quote" style="border-color:rgba(250,204,21,0.4)">
+                    "Aku minum bukan karena bahagia — tapi karena hidupku terlalu berat
+                    untuk ditanggung dengan kepala yang jernih."
+                </blockquote>
+                <p class="char-lore">
+                    Heiter tampak seperti pendeta pemabuk yang tidak serius — tapi di balik
+                    itu ada seseorang yang menanggung beban orang banyak dengan diam.
+                    Ia mengadopsi Fern, anak yatim dari pasca-perang, dan mendidiknya
+                    menjadi penyihir handal sebelum ia sendiri mati karena penyakit.
+                    Permintaan terakhirnya kepada Frieren: jaga Fern. Dan Frieren
+                    menerima tanpa ragu — itulah cara mereka menghormati orang
+                    yang pernah berjuang bersama.
+                </p>
+                <div class="char-power-bars">
+                    <div class="cpb-row">
+                        <span class="cpb-label">Sihir Penyembuhan</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:90%; --color:#facc15"></div></div>
+                        <span class="cpb-num">90</span>
+                    </div>
+                    <div class="cpb-row">
+                        <span class="cpb-label">Kebijaksanaan</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:95%; --color:#facc15"></div></div>
+                        <span class="cpb-num">95</span>
+                    </div>
+                    <div class="cpb-row">
+                        <span class="cpb-label">Toleransi Alkohol</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:99%; --color:#f97316"></div></div>
+                        <span class="cpb-num">99</span>
+                    </div>
+                </div>
+                <div class="char-trait-chips">
+                    <span class="trait-chip" style="border-color:rgba(250,204,21,0.3);color:#facc15">Bijak</span>
+                    <span class="trait-chip" style="border-color:rgba(250,204,21,0.3);color:#facc15">Pemabuk</span>
+                    <span class="trait-chip" style="border-color:rgba(250,204,21,0.3);color:#facc15">Peduli Diam-Diam</span>
+                    <span class="trait-chip" style="border-color:rgba(250,204,21,0.3);color:#facc15">Ayah Fern</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── EISEN ── -->
+        <div class="char-panel" data-panel="eisen">
+            <div class="char-panel-left">
+                <div class="char-portrait-wrap">
+                    <img src="images/character-eisen.png" alt="Eisen" class="char-portrait-img" onerror="this.style.opacity='0.3'">
+                    <div class="char-portrait-glow" style="--glow-color: rgba(161,161,170,0.25)"></div>
+                </div>
+                <div class="char-quick-stats">
+                    <div class="qs-item"><span class="qs-label">Ras</span><span class="qs-val">Zwerg</span></div>
+                    <div class="qs-item"><span class="qs-label">Status</span><span class="qs-val">Tua, Hidup</span></div>
+                    <div class="qs-item"><span class="qs-label">Peran</span><span class="qs-val">Pejuang</span></div>
+                    <div class="qs-item"><span class="qs-label">Murid</span><span class="qs-val">Stark</span></div>
+                </div>
+            </div>
+            <div class="char-panel-right">
+                <div class="char-name-block">
+                    <div class="char-rune">アイゼン</div>
+                    <h3 class="char-fullname" style="color:#a1a1aa">Eisen</h3>
+                    <p class="char-title-tag">Pejuang Zwerg dari Kelompok Pahlawan</p>
+                </div>
+                <blockquote class="char-quote" style="border-color:rgba(161,161,170,0.4)">
+                    "Kekuatan bukan tentang siapa yang paling kuat. Tapi siapa yang
+                    tetap berdiri untuk melindungi yang lemah."
+                </blockquote>
+                <p class="char-lore">
+                    Eisen adalah Zwerg — ras yang umurnya panjang seperti elf tapi bukan
+                    immortal. Ia menjadi pejuang terkuat dalam kelompok Himmel, tapi
+                    kini tubuhnya sudah terlalu tua untuk berperang. Ia melatih Stark —
+                    anak desa yang hampir kehilangan nyawa — dan mewariskan kekuatan
+                    bukan hanya secara fisik, tapi juga nilai tentang kenapa seseorang
+                    layak untuk bertarung. Diam, keras, tapi sangat peduli pada generasi
+                    yang akan meneruskan perjalanan.
+                </p>
+                <div class="char-power-bars">
+                    <div class="cpb-row">
+                        <span class="cpb-label">Kekuatan Fisik (Puncak)</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:98%; --color:#a1a1aa"></div></div>
+                        <span class="cpb-num">98</span>
+                    </div>
+                    <div class="cpb-row">
+                        <span class="cpb-label">Ketahanan</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:96%; --color:#a1a1aa"></div></div>
+                        <span class="cpb-num">96</span>
+                    </div>
+                    <div class="cpb-row">
+                        <span class="cpb-label">Kemampuan Mengajar</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:92%; --color:#71717a"></div></div>
+                        <span class="cpb-num">92</span>
+                    </div>
+                </div>
+                <div class="char-trait-chips">
+                    <span class="trait-chip" style="border-color:rgba(161,161,170,0.3);color:#a1a1aa">Teguh</span>
+                    <span class="trait-chip" style="border-color:rgba(161,161,170,0.3);color:#a1a1aa">Diam</span>
+                    <span class="trait-chip" style="border-color:rgba(161,161,170,0.3);color:#a1a1aa">Pelindung</span>
+                    <span class="trait-chip" style="border-color:rgba(161,161,170,0.3);color:#a1a1aa">Veteran</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── FERN ── -->
+        <div class="char-panel" data-panel="fern">
+            <div class="char-panel-left">
+                <div class="char-portrait-wrap">
+                    <img src="images/character-fern.png" alt="Fern" class="char-portrait-img">
+                    <div class="char-portrait-glow" style="--glow-color: rgba(167,139,250,0.25)"></div>
+                </div>
+                <div class="char-quick-stats">
+                    <div class="qs-item"><span class="qs-label">Ras</span><span class="qs-val">Manusia</span></div>
+                    <div class="qs-item"><span class="qs-label">Usia</span><span class="qs-val">~18</span></div>
+                    <div class="qs-item"><span class="qs-label">Peran</span><span class="qs-val">Penyihir</span></div>
+                    <div class="qs-item"><span class="qs-label">Guru</span><span class="qs-val">Frieren</span></div>
+                </div>
+            </div>
+            <div class="char-panel-right">
+                <div class="char-name-block">
+                    <div class="char-rune">フェルン</div>
+                    <h3 class="char-fullname" style="color:#a78bfa">Fern</h3>
+                    <p class="char-title-tag">Murid Frieren, Ahli Deteksi Mana</p>
+                </div>
+                <blockquote class="char-quote" style="border-color:rgba(167,139,250,0.4)">
+                    "Guru tidak pernah bertanya apakah aku baik-baik saja.
+                    Tapi ia selalu ada saat aku membutuhkan."
+                </blockquote>
+                <p class="char-lore">
+                    Fern adalah anak yatim yang dibesarkan Heiter — pendeta dari
+                    kelompok Himmel. Sejak kecil ia belajar sihir dengan disiplin
+                    yang luar biasa, melampaui rata-rata penyihir seusianya.
+                    Di balik wajah datar dan ekspresi yang jarang berubah, tersimpan
+                    rasa sayang yang dalam terhadap Frieren dan Stark. Ia adalah
+                    penerus generasi baru — murid yang suatu hari akan melampaui
+                    gurunya sendiri, tapi tidak pernah melupakan dari mana ia berasal.
+                </p>
+                <div class="char-power-bars">
+                    <div class="cpb-row">
+                        <span class="cpb-label">Kecepatan Casting</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:95%; --color:#a78bfa"></div></div>
+                        <span class="cpb-num">95</span>
+                    </div>
+                    <div class="cpb-row">
+                        <span class="cpb-label">Deteksi Mana</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:93%; --color:#a78bfa"></div></div>
+                        <span class="cpb-num">93</span>
+                    </div>
+                    <div class="cpb-row">
+                        <span class="cpb-label">Akurasi Serangan</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:96%; --color:#c084fc"></div></div>
+                        <span class="cpb-num">96</span>
+                    </div>
+                    <div class="cpb-row">
+                        <span class="cpb-label">Ekspresi Wajah</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:12%; --color:#ec4899"></div></div>
+                        <span class="cpb-num">12</span>
+                    </div>
+                </div>
+                <div class="char-trait-chips">
+                    <span class="trait-chip" style="border-color:rgba(167,139,250,0.3);color:#a78bfa">Disiplin</span>
+                    <span class="trait-chip" style="border-color:rgba(167,139,250,0.3);color:#a78bfa">Prodigy</span>
+                    <span class="trait-chip" style="border-color:rgba(167,139,250,0.3);color:#a78bfa">Diam tapi Perhatian</span>
+                    <span class="trait-chip" style="border-color:rgba(167,139,250,0.3);color:#a78bfa">Cemburu pada Frieren</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── STARK ── -->
+        <div class="char-panel" data-panel="stark">
+            <div class="char-panel-left">
+                <div class="char-portrait-wrap">
+                    <img src="images/character-stark.png" alt="Stark" class="char-portrait-img">
+                    <div class="char-portrait-glow" style="--glow-color: rgba(249,115,22,0.25)"></div>
+                </div>
+                <div class="char-quick-stats">
+                    <div class="qs-item"><span class="qs-label">Ras</span><span class="qs-val">Manusia</span></div>
+                    <div class="qs-item"><span class="qs-label">Usia</span><span class="qs-val">~17</span></div>
+                    <div class="qs-item"><span class="qs-label">Peran</span><span class="qs-val">Pejuang</span></div>
+                    <div class="qs-item"><span class="qs-label">Guru</span><span class="qs-val">Eisen</span></div>
+                </div>
+            </div>
+            <div class="char-panel-right">
+                <div class="char-name-block">
+                    <div class="char-rune">シュタルク</div>
+                    <h3 class="char-fullname" style="color:#f97316">Stark</h3>
+                    <p class="char-title-tag">Pejuang Terkuat Generasi Baru</p>
+                </div>
+                <blockquote class="char-quote" style="border-color:rgba(249,115,22,0.4)">
+                    "Aku bukan pemberani. Aku hanya tidak bisa berdiam diri
+                    saat orang yang penting bagiku dalam bahaya."
+                </blockquote>
+                <p class="char-lore">
+                    Stark adalah murid Eisen yang diam-diam mewarisi kekuatan
+                    melebihi gurunya sendiri — tapi tidak pernah menyadarinya.
+                    Ia tumbuh di desa yang hancur, selamat karena Eisen,
+                    dan kini berjalan bersama Frieren dan Fern menuju utara.
+                    Ia penakut secara mental tapi tubuhnya bergerak duluan
+                    saat seseorang terancam. Di balik muka polosnya tersembunyi
+                    potensi yang bahkan Eisen pun akui sebagai luar biasa.
+                    Hubungannya dengan Fern — awkward, canggung, tapi nyata.
+                </p>
+                <div class="char-power-bars">
+                    <div class="cpb-row">
+                        <span class="cpb-label">Kekuatan Serangan</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:97%; --color:#f97316"></div></div>
+                        <span class="cpb-num">97</span>
+                    </div>
+                    <div class="cpb-row">
+                        <span class="cpb-label">Insting Bertarung</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:94%; --color:#f97316"></div></div>
+                        <span class="cpb-num">94</span>
+                    </div>
+                    <div class="cpb-row">
+                        <span class="cpb-label">Ketahanan</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:90%; --color:#fb923c"></div></div>
+                        <span class="cpb-num">90</span>
+                    </div>
+                    <div class="cpb-row">
+                        <span class="cpb-label">Keberanian (Diakui)</span>
+                        <div class="cpb-track"><div class="cpb-fill" style="--w:35%; --color:#ec4899"></div></div>
+                        <span class="cpb-num">35</span>
+                    </div>
+                </div>
+                <div class="char-trait-chips">
+                    <span class="trait-chip" style="border-color:rgba(249,115,22,0.3);color:#f97316">Kuat</span>
+                    <span class="trait-chip" style="border-color:rgba(249,115,22,0.3);color:#f97316">Penakut di Luar</span>
+                    <span class="trait-chip" style="border-color:rgba(249,115,22,0.3);color:#f97316">Pelindung</span>
+                    <span class="trait-chip" style="border-color:rgba(249,115,22,0.3);color:#f97316">Canggung sama Fern</span>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end char-showcase -->
+</section>
+
+<!-- ============================================================
+    SECTION BARU: KENANGAN HIMMEL — TIMELINE EMOSIONAL
+    Taruh SETELAH section characters-section
+    ============================================================ -->
+
+<section class="memory-section" id="memories">
+    <div class="mem-wrapper">
+
+        <div class="mem-header">
+            <p class="cs-eyebrow">✦ Perjalanan Melintasi Waktu</p>
+            <h2 class="section-title">Kenangan yang Tak Terhapus</h2>
+            <p class="cs-subtitle">
+                Seribu tahun berlalu seperti angin bagi Frieren —
+                tapi ada beberapa momen yang membekas selamanya.
+            </p>
+        </div>
+
+        <div class="timeline-container">
+
+            <div class="tl-item" data-side="left">
+                <div class="tl-dot" style="--dot-color:#fbbf24"></div>
+                <div class="tl-card" style="--accent:#fbbf24">
+                    <div class="tl-year">~50 Tahun Lalu</div>
+                    <h3 class="tl-title">Kemenangan atas Raja Iblis</h3>
+                    <p class="tl-body">
+                        Setelah sepuluh tahun berjalan bersama, Frieren, Himmel, Heiter,
+                        dan Eisen akhirnya mengalahkan Demon King. Bagi Frieren itu
+                        "hanya sepuluh tahun" — sekejap dalam hidupnya yang panjang.
+                        Tapi bagi tiga manusia di sisinya, itu adalah seluruh masa muda mereka.
+                    </p>
+                    <div class="tl-tag">Kemenangan · Akhir dari Awal</div>
+                </div>
+            </div>
+
+            <div class="tl-item" data-side="right">
+                <div class="tl-dot" style="--dot-color:#ec4899"></div>
+                <div class="tl-card" style="--accent:#ec4899">
+                    <div class="tl-year">Setelah Kemenangan</div>
+                    <h3 class="tl-title">Himmel Pergi — Frieren Menangis</h3>
+                    <p class="tl-body">
+                        Himmel meninggal di usia tua, dikelilingi orang-orang yang mencintainya.
+                        Frieren berdiri di pemakamannya dan untuk pertama kali dalam hidupnya
+                        yang panjang — ia menangis. Bukan karena kehilangan, tapi karena
+                        baru menyadari ia tidak pernah benar-benar mengenal orang itu.
+                        Dan sekarang sudah terlambat.
+                    </p>
+                    <div class="tl-tag">Kehilangan · Penyesalan · Air Mata Pertama</div>
+                </div>
+            </div>
+
+            <div class="tl-item" data-side="left">
+                <div class="tl-dot" style="--dot-color:#facc15"></div>
+                <div class="tl-card" style="--accent:#facc15">
+                    <div class="tl-year">Setelahnya</div>
+                    <h3 class="tl-title">Permintaan Terakhir Heiter</h3>
+                    <p class="tl-body">
+                        Heiter yang sudah renta dan sakit menemui Frieren dengan satu
+                        permintaan: jaga Fern — anak yang ia besarkan. Frieren,
+                        yang tidak pernah memiliki murid, menerima tanpa bertanya.
+                        Ini adalah cara mereka — orang-orang yang pernah berjalan
+                        bersama Himmel — saling menjaga warisan yang ditinggalkan.
+                    </p>
+                    <div class="tl-tag">Amanat · Warisan · Keluarga</div>
+                </div>
+            </div>
+
+            <div class="tl-item" data-side="right">
+                <div class="tl-dot" style="--dot-color:#a78bfa"></div>
+                <div class="tl-card" style="--accent:#a78bfa">
+                    <div class="tl-year">Perjalanan Baru</div>
+                    <h3 class="tl-title">Frieren, Fern, dan Stark</h3>
+                    <p class="tl-body">
+                        Dengan Fern sebagai murid dan Stark yang bergabung kemudian,
+                        Frieren memulai perjalanan baru menuju Ende — ujung utara dunia —
+                        tempat konon arwah bisa ditemui. Ia ingin bertemu Himmel satu kali
+                        lagi. Bukan untuk bernostalgia — tapi untuk mengatakan apa yang
+                        dulu tidak sempat ia ucapkan.
+                    </p>
+                    <div class="tl-tag">Pencarian · Harapan · Perjalanan Panjang</div>
+                </div>
+            </div>
+
+            <div class="tl-item" data-side="left">
+                <div class="tl-dot" style="--dot-color:#5eecff"></div>
+                <div class="tl-card" style="--accent:#5eecff">
+                    <div class="tl-year">Kini</div>
+                    <h3 class="tl-title">Belajar Mengenal Manusia</h3>
+                    <p class="tl-body">
+                        Di setiap desa yang dilewati, di setiap manusia yang ditemui,
+                        Frieren belajar sesuatu yang tidak pernah ia pelajari dalam
+                        seribu tahun hidupnya: bahwa waktu bersama seseorang —
+                        bahkan yang singkat — adalah sesuatu yang berharga.
+                        Bukan panjangnya waktu, tapi kedalamannya.
+                    </p>
+                    <div class="tl-tag">Pertumbuhan · Makna · Frieren Saat Ini</div>
+                </div>
+            </div>
+
+        </div><!-- end timeline -->
+
+    </div>
+</section>
 
 
 <!-- ===== PROFILE & SUPPORT ME ===== -->
