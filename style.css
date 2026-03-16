@@ -503,3 +503,308 @@ body {
         width: 280px;
     }
 }
+
+/* ===== CONTACT & SUPPORT SECTION ===== */
+.contact-section {
+    padding: 6rem 2rem;
+    background: linear-gradient(180deg,
+        rgba(10, 10, 20, 0.95) 0%,
+        rgba(15, 5, 30, 0.98) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.contact-section::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(94, 236, 255, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.contact-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.contact-subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 1rem;
+    margin-top: -2rem;
+    margin-bottom: 3rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+/* Developer Card */
+.dev-card {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(94, 236, 255, 0.15);
+    border-radius: 20px;
+    padding: 2rem 2.5rem;
+    margin-bottom: 3rem;
+    backdrop-filter: blur(10px);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dev-card:hover {
+    border-color: rgba(94, 236, 255, 0.4);
+    box-shadow: 0 0 40px rgba(94, 236, 255, 0.08);
+}
+
+.dev-avatar {
+    position: relative;
+    flex-shrink: 0;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    background: linear-gradient(135deg, #5eecff, #a78bfa) border-box;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: destination-out;
+    mask-composite: exclude;
+    animation: rotate 4s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.dev-initial {
+    font-size: 2rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #5eecff, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    z-index: 1;
+}
+
+.dev-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.dev-handle {
+    color: #5eecff;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    opacity: 0.8;
+}
+
+.github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #fff;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 30px;
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.github-link:hover {
+    background: #5eecff;
+    color: #0a0a0a;
+    border-color: #5eecff;
+    transform: translateY(-2px);
+}
+
+/* Social Media Grid */
+.socmed-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 3.5rem;
+}
+
+.socmed-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1.5rem 1rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 16px;
+    border: 1px solid rgba(94, 236, 255, 0.1);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.socmed-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(94, 236, 255, 0.5);
+    box-shadow: 0 15px 35px rgba(94, 236, 255, 0.15);
+}
+
+.socmed-card[data-platform="instagram"]:hover { border-color: #e1306c; box-shadow: 0 15px 35px rgba(225, 48, 108, 0.2); }
+.socmed-card[data-platform="tiktok"]:hover    { border-color: #69c9d0; box-shadow: 0 15px 35px rgba(105, 201, 208, 0.2); }
+.socmed-card[data-platform="discord"]:hover   { border-color: #5865f2; box-shadow: 0 15px 35px rgba(88, 101, 242, 0.2); }
+.socmed-card[data-platform="telegram"]:hover  { border-color: #26a5e4; box-shadow: 0 15px 35px rgba(38, 165, 228, 0.2); }
+
+.socmed-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(94, 236, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5eecff;
+    transition: background 0.3s ease;
+}
+
+.socmed-card[data-platform="instagram"] .socmed-icon { color: #e1306c; background: rgba(225, 48, 108, 0.08); }
+.socmed-card[data-platform="tiktok"]    .socmed-icon { color: #69c9d0; background: rgba(105, 201, 208, 0.08); }
+.socmed-card[data-platform="discord"]   .socmed-icon { color: #5865f2; background: rgba(88, 101, 242, 0.08); }
+.socmed-card[data-platform="telegram"]  .socmed-icon { color: #26a5e4; background: rgba(38, 165, 228, 0.08); }
+
+.socmed-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.socmed-handle {
+    font-size: 0.78rem;
+    color: #666;
+}
+
+/* Projects Grid */
+.projects-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.projects-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, rgba(94, 236, 255, 0.3), transparent);
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.project-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 14px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.project-card:hover {
+    background: rgba(94, 236, 255, 0.06);
+    border-color: rgba(94, 236, 255, 0.3);
+    transform: translateX(6px);
+}
+
+.project-icon {
+    font-size: 1.6rem;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.project-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    flex: 1;
+}
+
+.project-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.project-desc {
+    font-size: 0.78rem;
+    color: #666;
+}
+
+.project-arrow {
+    color: #5eecff;
+    font-size: 1.2rem;
+    opacity: 0;
+    transform: translateX(-5px);
+    transition: all 0.3s ease;
+}
+
+.project-card:hover .project-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Responsive Contact Section */
+@media (max-width: 768px) {
+    .socmed-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dev-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem;
+    }
+
+    .github-link {
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .socmed-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+}
+/* ===== END CONTACT SECTION ===== */
