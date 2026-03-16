@@ -285,3 +285,138 @@ if (identityToggle && identityCards) {
     });
 }
 // ===== END IDENTITY TOGGLE =====
+
+// ===== JIKAN API - ANIME INFO MODAL =====
+const MAL_ID = 52991; // Frieren: Beyond Journey's End
+const JIKAN_URL = `https://api.jikan.moe/v4/anime/${MAL_ID}/full`;
+
+const btnInfoDetail    = document.getElementById('btnInfoDetail');
+const animeInfoModal   = document.getElementById('animeInfoModal');
+const closeAnimeModal  = document.getElementById('closeAnimeModal');
+const animeLoading     = document.getElementById('animeLoading');
+const animeModalContent= document.getElementById('animeModalContent');
+const animeError       = document.getElementById('animeError');
+const animeRetry       = document.getElementById('animeRetry');
+
+let animeDataCache = null;
+
+async function fetchAnimeData() {
+    // Pakai cache supaya tidak hit API berulang kali
+    if (animeDataCache) {
+        renderAnimeModal(animeDataCache);
+        return;
+    }
+
+    // Reset state
+    animeLoading.style.display      = 'flex';
+    animeModalContent.style.display = 'none';
+    animeError.style.display        = 'none';
+
+    try {
+        const res = await fetch(JIKAN_URL);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        animeDataCache = json.data;
+        renderAnimeModal(animeDataCache);
+    } catch (err) {
+        console.error('Jikan API error:', err);
+        animeLoading.style.display = 'none';
+        animeError.style.display   = 'block';
+    }
+}
+
+function renderAnimeModal(data) {
+    // Poster
+    document.getElementById('animeModalImg').src = data.images?.jpg?.large_image_url || '';
+
+    // Badges
+    const badges = document.getElementById('animeBadges');
+    badges.innerHTML = `
+        <span class="badge-status badge-tag">${data.status || 'N/A'}</span>
+        <span class="badge-type badge-tag">${data.type || 'N/A'}</span>
+        <span class="badge-year badge-tag">${data.year || data.aired?.prop?.from?.year || 'N/A'}</span>
+    `;
+
+    // Title
+    document.getElementById('animeModalTitle').textContent    = data.title_japanese || data.title;
+    document.getElementById('animeModalTitleEn').textContent  = data.title_english || data.title;
+
+    // Stats
+    const stats = document.getElementById('animeStats');
+    stats.innerHTML = `
+        <div class="anime-stat">
+            <span class="anime-stat-label">⭐ Score</span>
+            <span class="anime-stat-value">${data.score ?? 'N/A'}</span>
+        </div>
+        <div class="anime-stat">
+            <span class="anime-stat-label">📺 Episode</span>
+            <span class="anime-stat-value">${data.episodes ?? '?'}</span>
+        </div>
+        <div class="anime-stat">
+            <span class="anime-stat-label">📊 Rank</span>
+            <span class="anime-stat-value">#${data.rank ?? 'N/A'}</span>
+        </div>
+        <div class="anime-stat">
+            <span class="anime-stat-label">⏱ Durasi</span>
+            <span class="anime-stat-value">${data.duration?.replace(' per ep','') ?? 'N/A'}</span>
+        </div>
+        <div class="anime-stat">
+            <span class="anime-stat-label">🔞 Rating</span>
+            <span class="anime-stat-value">${data.rating?.split(' -')[0] ?? 'N/A'}</span>
+        </div>
+    `;
+
+    // Synopsis — potong kalau terlalu panjang
+    const rawSynopsis = data.synopsis || 'Tidak ada sinopsis.';
+    const synopsis = rawSynopsis.replace(/\[Written by MAL Rewrite\]/g, '').trim();
+    document.getElementById('animeModalSynopsis').textContent = synopsis;
+
+    // Genres
+    const genreWrap = document.getElementById('animeGenres');
+    const allTags = [
+        ...(data.genres || []),
+        ...(data.themes || []),
+        ...(data.demographics || [])
+    ];
+    genreWrap.innerHTML = allTags
+        .map(g => `<span class="genre-tag">${g.name}</span>`)
+        .join('');
+
+    // MAL Link
+    document.getElementById('animeMALLink').href = data.url || `https://myanimelist.net/anime/${MAL_ID}`;
+
+    // Show content
+    animeLoading.style.display      = 'none';
+    animeModalContent.style.display = 'block';
+}
+
+// Open modal
+function openAnimeModal() {
+    animeInfoModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    fetchAnimeData();
+}
+
+// Close modal
+function closeModal() {
+    animeInfoModal.classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+if (btnInfoDetail)  btnInfoDetail.addEventListener('click', openAnimeModal);
+if (closeAnimeModal) closeAnimeModal.addEventListener('click', closeModal);
+if (animeRetry)     animeRetry.addEventListener('click', () => {
+    animeDataCache = null;
+    fetchAnimeData();
+});
+
+// Close on overlay click
+animeInfoModal?.addEventListener('click', (e) => {
+    if (e.target === animeInfoModal) closeModal();
+});
+
+// Close on Escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+});
+// ===== END JIKAN API =====

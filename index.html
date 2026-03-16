@@ -6,6 +6,50 @@
     <title>Frieren: Beyond Journey's End - Gallery Experience</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
+<!-- ===== MODAL JIKAN API ===== -->
+<div id="animeInfoModal" class="anime-modal-overlay">
+    <div class="anime-modal-box">
+        <button class="anime-modal-close" id="closeAnimeModal">✕</button>
+
+        <!-- Loading State -->
+        <div class="anime-loading" id="animeLoading">
+            <div class="anime-spinner"></div>
+            <p>Mengambil data dari MyAnimeList...</p>
+        </div>
+
+        <!-- Content -->
+        <div class="anime-modal-content" id="animeModalContent" style="display:none">
+            <div class="anime-modal-header">
+                <img id="animeModalImg" src="" alt="" class="anime-modal-poster">
+                <div class="anime-modal-meta">
+                    <div class="anime-modal-badges" id="animeBadges"></div>
+                    <h2 id="animeModalTitle"></h2>
+                    <p id="animeModalTitleEn" class="anime-modal-subtitle"></p>
+                    <div class="anime-stats-row" id="animeStats"></div>
+                </div>
+            </div>
+            <div class="anime-modal-synopsis">
+                <h4>Sinopsis</h4>
+                <p id="animeModalSynopsis"></p>
+            </div>
+            <div class="anime-modal-genres" id="animeGenres"></div>
+            <div class="anime-modal-footer">
+                <a id="animeMALLink" href="" target="_blank" class="btn-mal">
+                    Lihat di MyAnimeList ↗
+                </a>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div class="anime-error" id="animeError" style="display:none">
+            <p>⚠ Gagal mengambil data. Cek koneksi internet kamu.</p>
+            <button id="animeRetry" class="btn-retry">Coba Lagi</button>
+        </div>
+    </div>
+</div>
+<!-- ===== END MODAL ===== -->
+
 <body>
 
     <section class="hero" id="inicio">
@@ -16,8 +60,13 @@
                     Penyihir elf yang telah hidup lebih dari seribu tahun. Setelah mengalahkan Raja Iblis bersama kelompok pahlawan, ia memulai perjalanan baru untuk memahami arti sebenarnya dari hubungan manusia.
                 </p>
                 <div class="hero-buttons">
-                    <button class="btn-primary">Tonton Sekarang</button>
-                    <button class="btn-secondary">Informasi Detail</button>
+                    <a href="https://www.bilibili.tv/en/play/2028342" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    class="btn-primary btn-watch">
+                    ▶ Tonton Sekarang
+                    </a>
+                    <button class="btn-secondary" id="btnInfoDetail">ℹ Informasi Detail</button>
                 </div>
             </div>
             <div class="hero-image">
@@ -177,17 +226,20 @@
                 <div class="profile-status-dot"></div>
             </div>
             <div class="profile-detail">
-                <p class="profile-greeting">✦ Developer & Anime Enthusiast</p>
-                <h2 class="profile-name">Fhazwan Athar<br><span>Ramadhan</span></h2>
+                <p class="profile-greeting">✦ Developer & Anime Lovers</p>
+                <h1 class="profile-name"><span>Fhazwan</span><br><span>Athar</span><br><span>Ramadhan</span></h1>
                 <p class="profile-bio">
-                    Siswa yang membangun dunia digital satu proyek dalam satu waktu.
-                    Terinspirasi oleh ketenangan Frieren — belajar perlahan, tapi membekas lama.
+                    Gua atar seorang pelajar yang tinggal di Jakarta 🏙️. Gua memiliki berbagai hobi yang gua sukai, mulai dari menggambar 🎨, coding 💻, membaca manga 📚, bermain game 🎮, hingga berpergian untuk mengeksplorasi tempat-tempat baru 🗺️.
+                    Gua membuat profil ini untuk semua orang yang berkunjung dan ingin melihat perjalanan gua di dunia pemrograman.
                 </p>
                 <div class="profile-stack">
                     <span class="stack-badge">HTML/CSS</span>
                     <span class="stack-badge">JavaScript</span>
                     <span class="stack-badge">Web Design</span>
+                    <span class="stack-badge">Ai Engineer</span>
                     <span class="stack-badge">Anime Fan</span>
+                    <span class="stack-badge">SMK</span>
+                    <span class="stack-badge">RPL</span>
                 </div>
                 <div class="profile-actions">
                     <a href="https://github.com/siswayangtidakmencolok-afk" target="_blank" class="btn-github">
@@ -209,7 +261,7 @@
                 <span class="toggle-arrow">▼</span>
                 <div class="toggle-ripple"></div>
             </button>
-            <p class="identity-hint">Klik untuk melihat karakter yang merepresentasikan kepribadian</p>
+            <p class="identity-hint">Klik untuk melihat penjelasan karakter di Anime</p>
 
             <div class="identity-cards" id="identityCards">
                 <!-- Frieren -->
