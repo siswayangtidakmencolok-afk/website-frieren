@@ -259,3 +259,29 @@ document.addEventListener('mousemove', (e) => {
 console.log('🚀 Website loaded successfully!');
 console.log('✨ All animations are active');
 console.log('⌨️  Use Arrow Keys to navigate character slider');
+
+// ===== PROFIL IDENTITAS TOGGLE =====
+const identityToggle = document.getElementById('identityToggle');
+const identityCards  = document.getElementById('identityCards');
+const identityBlock  = identityToggle?.closest('.identity-block');
+
+if (identityToggle && identityCards) {
+    identityToggle.addEventListener('click', function () {
+        const isOpen = identityCards.classList.contains('open');
+
+        identityCards.classList.toggle('open');
+        identityToggle.classList.toggle('active');
+        identityToggle.setAttribute('aria-expanded', String(!isOpen));
+        identityBlock?.classList.toggle('revealed');
+    });
+
+    // Ripple effect on toggle button
+    identityToggle.addEventListener('mousemove', (e) => {
+        const rect = identityToggle.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        identityToggle.style.setProperty('--x', x + '%');
+        identityToggle.style.setProperty('--y', y + '%');
+    });
+}
+// ===== END IDENTITY TOGGLE =====
