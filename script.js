@@ -483,7 +483,8 @@ function animateBars(panel) {
 })();
 
 // ============================================================
-// SPELL COLLECTION — Tambah di paling bawah script.js
+// SPELL COLLECTION — FIXED VERSION
+// Ganti seluruh blok spell di script.js dengan ini
 // ============================================================
 
 (function initSpells() {
@@ -493,40 +494,37 @@ function animateBars(panel) {
     const totalEl     = document.getElementById('totalCount');
     const fillEl      = document.getElementById('counterFill');
 
-    if (!cards.length) return;
+    if (!cards.length) {
+        console.warn('[Spells] Tidak ada .spell-card ditemukan di DOM');
+        return;
+    }
+
+    console.log('[Spells] Ditemukan', cards.length, 'kartu mantra');
 
     const total = cards.length;
-    let unlocked = 0;
-
     if (totalEl) totalEl.textContent = total;
 
     // ── Flip on click ──
     cards.forEach(card => {
         card.addEventListener('click', () => {
-            const wasLocked = card.dataset.unlocked === 'false';
             card.classList.toggle('unlocked');
             card.dataset.unlocked = card.classList.contains('unlocked') ? 'true' : 'false';
 
-            // Count unlocked
-            if (wasLocked && card.classList.contains('unlocked')) {
-                unlocked++;
-                // Tiny particle burst on unlock
+            if (card.classList.contains('unlocked')) {
                 spawnBurst(card);
-            } else if (!card.classList.contains('unlocked')) {
-                unlocked = Math.max(0, unlocked - 1);
             }
-
             updateCounter();
         });
     });
 
     function updateCounter() {
-        unlocked = document.querySelectorAll('.spell-card.unlocked').length;
-        if (unlockedEl) unlockedEl.textContent = unlocked;
-        if (fillEl) fillEl.style.width = (unlocked / total * 100) + '%';
+        const count = document.querySelectorAll('.spell-card.unlocked:not([style*="display: none"])').length;
+        if (unlockedEl) unlockedEl.textContent = document.querySelectorAll('.spell-card.unlocked').length;
+        const all = document.querySelectorAll('.spell-card').length;
+        if (fillEl) fillEl.style.width = (document.querySelectorAll('.spell-card.unlocked').length / all * 100) + '%';
     }
 
-    // ── Filter ──
+    // ── Filter — FIXED: hanya pakai display none/block, tidak ada class hidden ──
     filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             filterBtns.forEach(b => b.classList.remove('active'));
@@ -535,73 +533,66 @@ function animateBars(panel) {
             const filter = btn.dataset.filter;
             cards.forEach(card => {
                 const match = filter === 'all' || card.dataset.rarity === filter;
-                card.classList.toggle('hidden', !match);
-                // hidden cards lose absolute positioning via class, reset layout
-                if (!match) {
-                    card.style.display = 'none';
-                } else {
-                    card.style.display = '';
-                }
+                card.style.display = match ? '' : 'none';
             });
         });
     });
 
     // ── Burst effect on unlock ──
     function spawnBurst(card) {
-        const rect   = card.getBoundingClientRect();
-        const cx     = rect.left + rect.width / 2;
-        const cy     = rect.top  + rect.height / 2;
-        const color  = getComputedStyle(card.querySelector('.sc-back'))
-                        .getPropertyValue('--spell-color').trim() || '#5eecff';
+        const rect  = card.getBoundingClientRect();
+        const cx    = rect.left + rect.width / 2;
+        const cy    = rect.top  + rect.height / 2;
+
+        // Ambil warna dari CSS variable
+        const backEl = card.querySelector('.sc-back');
+        const raw    = backEl ? backEl.style.getPropertyValue('--spell-color') : '';
+        const color  = raw.trim() || '#5eecff';
 
         for (let i = 0; i < 12; i++) {
-            const dot = document.createElement('div');
+            const dot    = document.createElement('div');
             const angle  = (i / 12) * Math.PI * 2;
             const radius = 60 + Math.random() * 40;
-            const dx = Math.cos(angle) * radius;
-            const dy = Math.sin(angle) * radius;
+            const dx     = Math.cos(angle) * radius;
+            const dy     = Math.sin(angle) * radius;
 
             dot.style.cssText = `
-                position: fixed;
-                left: ${cx}px;
-                top:  ${cy}px;
-                width: 6px;
-                height: 6px;
-                border-radius: 50%;
-                background: ${color};
-                pointer-events: none;
-                z-index: 9999;
-                transform: translate(-50%, -50%);
-                transition: transform 0.6s ease, opacity 0.6s ease;
-                box-shadow: 0 0 8px ${color};
+                position:fixed;
+                left:${cx}px;top:${cy}px;
+                width:6px;height:6px;
+                border-radius:50%;
+                background:${color};
+                pointer-events:none;
+                z-index:9999;
+                transform:translate(-50%,-50%);
+                transition:transform 0.6s ease,opacity 0.6s ease;
+                box-shadow:0 0 8px ${color};
             `;
             document.body.appendChild(dot);
 
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    dot.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0)`;
+                    dot.style.transform = `translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(0)`;
                     dot.style.opacity   = '0';
                 });
             });
-
             setTimeout(() => dot.remove(), 700);
         }
     }
 
-    // ── Scroll reveal ──
+    // ── Scroll reveal — FIXED: pakai class bukan inline opacity ──
     const spellObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.style.opacity  = '1';
-                entry.target.style.transform = 'translateY(0)';
+                entry.target.classList.add('spell-visible');
+                spellObserver.unobserve(entry.target);
             }
         });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.08 });
 
     cards.forEach((card, i) => {
-        card.style.opacity   = '0';
-        card.style.transform = 'translateY(40px)';
-        card.style.transition = `opacity 0.5s ease ${i * 0.07}s, transform 0.5s ease ${i * 0.07}s`;
+        card.style.transitionDelay = (i * 0.07) + 's';
         spellObserver.observe(card);
     });
+
 })();

@@ -2008,14 +2008,18 @@ body {
     .char-tab { font-size: 0.78rem; padding: 0.5rem 1rem; }
 }
 
+
+/* ============================================================
+SPELL COLLECTION — FIXED CSS
+============================================================ */
+
 .spells-section {
     padding: 7rem 2rem;
-    background: linear-gradient(180deg,
-        rgba(3, 3, 12, 0.99) 0%,
-        rgba(6, 2, 18, 1) 50%,
-        rgba(3, 3, 12, 0.99) 100%);
+    background: #06020f;   /* solid dulu, bukan gradient transparan */
     position: relative;
     overflow: hidden;
+    /* DEBUG: uncomment baris di bawah kalau mau verify section ada */
+    /* outline: 3px solid red; */
 }
 
 /* Animated rune background */
@@ -2030,6 +2034,7 @@ body {
     word-break: break-all;
     pointer-events: none;
     animation: runeShift 20s linear infinite;
+    z-index: 0;
 }
 
 @keyframes runeShift {
@@ -2098,12 +2103,11 @@ body {
 .sf-btn.active {
     background: rgba(94,236,255,0.1);
     border-color: rgba(94,236,255,0.5);
-    color: #66bec9;
+    color: #5eecff;
 }
 
 .rarity-dot {
-    width: 8px;
-    height: 8px;
+    width: 8px; height: 8px;
     border-radius: 50%;
     flex-shrink: 0;
 }
@@ -2121,20 +2125,21 @@ body {
     perspective: 1000px;
     height: 340px;
     cursor: pointer;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    /* FIXED: tidak ada opacity:0 di sini — pakai class reveal */
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-.spell-card.hidden {
-    opacity: 0;
-    pointer-events: none;
-    transform: scale(0.9);
-    position: absolute;
+/* FIXED: reveal class dari JS */
+.spell-card.spell-visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .sc-inner {
     position: relative;
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     transform-style: preserve-3d;
     transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 18px;
@@ -2144,13 +2149,14 @@ body {
     transform: rotateY(180deg);
 }
 
-/* FRONT */
+/* ── FRONT ── */
 .sc-front {
     position: absolute;
     inset: 0;
     backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     border-radius: 18px;
-    background: linear-gradient(145deg, rgba(14,14,30,0.95), rgba(8,6,20,0.98));
+    background: linear-gradient(145deg, rgba(14,14,30,0.97), rgba(8,6,22,1));
     border: 1px solid rgba(94,236,255,0.15);
     display: flex;
     flex-direction: column;
@@ -2158,19 +2164,19 @@ body {
     justify-content: center;
     gap: 1rem;
     overflow: hidden;
-    transition: border-color 0.3s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .spell-card:hover .sc-front {
     border-color: rgba(94,236,255,0.4);
-    box-shadow: 0 0 30px rgba(94,236,255,0.08), inset 0 0 30px rgba(94,236,255,0.03);
+    box-shadow: 0 0 30px rgba(94,236,255,0.08),
+                inset 0 0 30px rgba(94,236,255,0.03);
 }
 
-/* Seal animation */
+/* Seal rings */
 .sc-seal {
     position: relative;
-    width: 100px;
-    height: 100px;
+    width: 100px; height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2193,12 +2199,8 @@ body {
     animation: sealSpin2 5s linear infinite reverse;
 }
 
-@keyframes sealSpin1 {
-    to { transform: rotate(360deg); }
-}
-@keyframes sealSpin2 {
-    to { transform: rotate(360deg); }
-}
+@keyframes sealSpin1 { to { transform: rotate(360deg); } }
+@keyframes sealSpin2 { to { transform: rotate(360deg); } }
 
 .sc-seal-core {
     font-size: 0.65rem;
@@ -2214,7 +2216,7 @@ body {
     border-color: rgba(94,236,255,0.5);
 }
 
-/* Front rarity badge */
+/* Front rarity */
 .sc-front-rarity {
     font-size: 0.68rem;
     letter-spacing: 0.12em;
@@ -2223,10 +2225,10 @@ body {
     border-radius: 20px;
 }
 
-.sc-front-rarity.useless   { color: #9ca3af; background: rgba(107,114,128,0.15); border: 1px solid rgba(107,114,128,0.3); }
-.sc-front-rarity.combat    { color: #60a5fa; background: rgba(59,130,246,0.12);  border: 1px solid rgba(59,130,246,0.3); }
-.sc-front-rarity.rare      { color: #c084fc; background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.3); }
-.sc-front-rarity.legendary { color: #fbbf24; background: rgba(251,191,36,0.12);  border: 1px solid rgba(251,191,36,0.3); }
+.sc-front-rarity.useless   { color:#9ca3af; background:rgba(107,114,128,0.15); border:1px solid rgba(107,114,128,0.3); }
+.sc-front-rarity.combat    { color:#60a5fa; background:rgba(59,130,246,0.12);  border:1px solid rgba(59,130,246,0.3); }
+.sc-front-rarity.rare      { color:#c084fc; background:rgba(167,139,250,0.12); border:1px solid rgba(167,139,250,0.3); }
+.sc-front-rarity.legendary { color:#fbbf24; background:rgba(251,191,36,0.12);  border:1px solid rgba(251,191,36,0.3); }
 
 .sc-front-hint {
     font-size: 0.7rem;
@@ -2234,7 +2236,7 @@ body {
     letter-spacing: 0.08em;
 }
 
-/* Legendary card front — shimmer */
+/* Legendary shimmer */
 .spell-card[data-rarity="legendary"] .sc-front {
     border-color: rgba(251,191,36,0.2);
 }
@@ -2245,21 +2247,23 @@ body {
     inset: 0;
     background: linear-gradient(135deg, transparent 40%, rgba(251,191,36,0.04) 50%, transparent 60%);
     animation: legendaryShimmer 3s ease-in-out infinite;
+    background-size: 200% 200%;
 }
 
 @keyframes legendaryShimmer {
-    0%   { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    0%   { background-position: -100% 0; }
+    100% { background-position: 200% 0; }
 }
 
-/* BACK */
+/* ── BACK ── */
 .sc-back {
     position: absolute;
     inset: 0;
     backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     transform: rotateY(180deg);
     border-radius: 18px;
-    background: linear-gradient(145deg, rgba(10,10,24,0.98), rgba(6,4,16,1));
+    background: linear-gradient(145deg, rgba(10,10,24,0.99), rgba(6,4,16,1));
     border: 1px solid var(--spell-color, #5eecff);
     box-shadow: 0 0 30px var(--spell-glow, rgba(94,236,255,0.15)),
                 inset 0 0 40px rgba(0,0,0,0.5);
@@ -2270,127 +2274,36 @@ body {
     overflow: hidden;
 }
 
-/* Particles on back */
 .sc-back-particles {
     position: absolute;
     inset: 0;
     background: radial-gradient(circle at 80% 20%, var(--spell-glow, rgba(94,236,255,0.08)) 0%, transparent 60%);
     pointer-events: none;
+    z-index: 0;
 }
 
-.sc-rarity-badge {
-    font-size: 0.65rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    font-weight: 700;
-    position: relative;
-    z-index: 1;
-}
+.sc-rarity-badge { font-size:0.65rem; letter-spacing:0.14em; text-transform:uppercase; font-weight:700; position:relative; z-index:1; }
+.sc-rarity-badge.useless   { color:#6b7280; }
+.sc-rarity-badge.combat    { color:#60a5fa; }
+.sc-rarity-badge.rare      { color:#c084fc; }
+.sc-rarity-badge.legendary { color:#fbbf24; }
 
-.sc-rarity-badge.useless   { color: #6b7280; }
-.sc-rarity-badge.combat    { color: #60a5fa; }
-.sc-rarity-badge.rare      { color: #c084fc; }
-.sc-rarity-badge.legendary { color: #fbbf24; }
+.sc-symbol { font-size:1.8rem; color:var(--spell-color,#5eecff); opacity:0.5; line-height:1; position:relative; z-index:1; }
+.sc-name   { font-size:1.15rem; font-weight:800; color:var(--spell-color,#5eecff); line-height:1.1; position:relative; z-index:1; }
+.sc-jp     { font-size:0.65rem; color:rgba(255,255,255,0.2); letter-spacing:0.08em; margin-top:-0.3rem; position:relative; z-index:1; }
+.sc-effect { font-size:0.76rem; line-height:1.7; color:#777; flex:1; position:relative; z-index:1; }
 
-.sc-symbol {
-    font-size: 1.8rem;
-    color: var(--spell-color, #5eecff);
-    opacity: 0.5;
-    line-height: 1;
-    position: relative;
-    z-index: 1;
-}
+.sc-tags { display:flex; flex-wrap:wrap; gap:0.3rem; position:relative; z-index:1; }
+.sc-tags span { padding:0.2rem 0.55rem; border-radius:10px; font-size:0.64rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); color:#888; }
 
-.sc-name {
-    font-size: 1.15rem;
-    font-weight: 800;
-    color: var(--spell-color, #5eecff);
-    line-height: 1.1;
-    position: relative;
-    z-index: 1;
-}
-
-.sc-jp {
-    font-size: 0.65rem;
-    color: rgba(255,255,255,0.2);
-    letter-spacing: 0.08em;
-    margin-top: -0.3rem;
-    position: relative;
-    z-index: 1;
-}
-
-.sc-effect {
-    font-size: 0.76rem;
-    line-height: 1.7;
-    color: #777;
-    flex: 1;
-    position: relative;
-    z-index: 1;
-}
-
-.sc-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.3rem;
-    position: relative;
-    z-index: 1;
-}
-
-.sc-tags span {
-    padding: 0.2rem 0.55rem;
-    border-radius: 10px;
-    font-size: 0.64rem;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
-    color: #888;
-}
-
-.sc-user {
-    font-size: 0.66rem;
-    color: #444;
-    border-top: 1px solid rgba(255,255,255,0.05);
-    padding-top: 0.5rem;
-    letter-spacing: 0.04em;
-    position: relative;
-    z-index: 1;
-}
+.sc-user { font-size:0.66rem; color:#444; border-top:1px solid rgba(255,255,255,0.05); padding-top:0.5rem; letter-spacing:0.04em; position:relative; z-index:1; }
 
 /* ── Counter ── */
-.spells-counter {
-    text-align: center;
-    font-size: 0.82rem;
-    color: #555;
-    letter-spacing: 0.08em;
-}
+.spells-counter { text-align:center; font-size:0.82rem; color:#555; letter-spacing:0.08em; }
+.spells-counter span { color:#5eecff; font-weight:700; }
+.spells-counter-bar { width:280px; height:3px; background:rgba(255,255,255,0.05); border-radius:2px; margin:0.75rem auto 0; overflow:hidden; }
+.spells-counter-fill { height:100%; background:linear-gradient(to right,#5eecff,#a78bfa); border-radius:2px; width:0%; transition:width 0.5s ease; }
 
-.spells-counter span {
-    color: #5eecff;
-    font-weight: 700;
-}
-
-.spells-counter-bar {
-    width: 280px;
-    height: 3px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 2px;
-    margin: 0.75rem auto 0;
-    overflow: hidden;
-}
-
-.spells-counter-fill {
-    height: 100%;
-    background: linear-gradient(to right, #5eecff, #a78bfa);
-    border-radius: 2px;
-    width: 0%;
-    transition: width 0.5s ease;
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-    .spells-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 540px) {
-    .spells-grid { grid-template-columns: 1fr; }
-    .spell-card  { height: 320px; }
-}
+/* ── Responsive ── */
+@media (max-width: 900px) { .spells-grid { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 540px) { .spells-grid { grid-template-columns: 1fr; } .spell-card { height:320px; } }
