@@ -481,3 +481,127 @@ function animateBars(panel) {
 
     items.forEach(item => obs.observe(item));
 })();
+
+// ============================================================
+// SPELL COLLECTION — Tambah di paling bawah script.js
+// ============================================================
+
+(function initSpells() {
+    const cards       = document.querySelectorAll('.spell-card');
+    const filterBtns  = document.querySelectorAll('.sf-btn');
+    const unlockedEl  = document.getElementById('unlockedCount');
+    const totalEl     = document.getElementById('totalCount');
+    const fillEl      = document.getElementById('counterFill');
+
+    if (!cards.length) return;
+
+    const total = cards.length;
+    let unlocked = 0;
+
+    if (totalEl) totalEl.textContent = total;
+
+    // ── Flip on click ──
+    cards.forEach(card => {
+        card.addEventListener('click', () => {
+            const wasLocked = card.dataset.unlocked === 'false';
+            card.classList.toggle('unlocked');
+            card.dataset.unlocked = card.classList.contains('unlocked') ? 'true' : 'false';
+
+            // Count unlocked
+            if (wasLocked && card.classList.contains('unlocked')) {
+                unlocked++;
+                // Tiny particle burst on unlock
+                spawnBurst(card);
+            } else if (!card.classList.contains('unlocked')) {
+                unlocked = Math.max(0, unlocked - 1);
+            }
+
+            updateCounter();
+        });
+    });
+
+    function updateCounter() {
+        unlocked = document.querySelectorAll('.spell-card.unlocked').length;
+        if (unlockedEl) unlockedEl.textContent = unlocked;
+        if (fillEl) fillEl.style.width = (unlocked / total * 100) + '%';
+    }
+
+    // ── Filter ──
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const filter = btn.dataset.filter;
+            cards.forEach(card => {
+                const match = filter === 'all' || card.dataset.rarity === filter;
+                card.classList.toggle('hidden', !match);
+                // hidden cards lose absolute positioning via class, reset layout
+                if (!match) {
+                    card.style.display = 'none';
+                } else {
+                    card.style.display = '';
+                }
+            });
+        });
+    });
+
+    // ── Burst effect on unlock ──
+    function spawnBurst(card) {
+        const rect   = card.getBoundingClientRect();
+        const cx     = rect.left + rect.width / 2;
+        const cy     = rect.top  + rect.height / 2;
+        const color  = getComputedStyle(card.querySelector('.sc-back'))
+                        .getPropertyValue('--spell-color').trim() || '#5eecff';
+
+        for (let i = 0; i < 12; i++) {
+            const dot = document.createElement('div');
+            const angle  = (i / 12) * Math.PI * 2;
+            const radius = 60 + Math.random() * 40;
+            const dx = Math.cos(angle) * radius;
+            const dy = Math.sin(angle) * radius;
+
+            dot.style.cssText = `
+                position: fixed;
+                left: ${cx}px;
+                top:  ${cy}px;
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: ${color};
+                pointer-events: none;
+                z-index: 9999;
+                transform: translate(-50%, -50%);
+                transition: transform 0.6s ease, opacity 0.6s ease;
+                box-shadow: 0 0 8px ${color};
+            `;
+            document.body.appendChild(dot);
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    dot.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0)`;
+                    dot.style.opacity   = '0';
+                });
+            });
+
+            setTimeout(() => dot.remove(), 700);
+        }
+    }
+
+    // ── Scroll reveal ──
+    const spellObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity  = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1 });
+
+    cards.forEach((card, i) => {
+        card.style.opacity   = '0';
+        card.style.transform = 'translateY(40px)';
+        card.style.transition = `opacity 0.5s ease ${i * 0.07}s, transform 0.5s ease ${i * 0.07}s`;
+        spellObserver.observe(card);
+    });
+})();

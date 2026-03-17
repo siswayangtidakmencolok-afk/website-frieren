@@ -2007,3 +2007,390 @@ body {
 
     .char-tab { font-size: 0.78rem; padding: 0.5rem 1rem; }
 }
+
+.spells-section {
+    padding: 7rem 2rem;
+    background: linear-gradient(180deg,
+        rgba(3, 3, 12, 0.99) 0%,
+        rgba(6, 2, 18, 1) 50%,
+        rgba(3, 3, 12, 0.99) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Animated rune background */
+.spells-section::before {
+    content: '✦ ◈ ◎ ⊗ ◌ ✿ ◉ ◆ ✦ ◈ ◎ ⊗ ◌ ✿ ◉ ◆';
+    position: absolute;
+    inset: 0;
+    font-size: 1.5rem;
+    color: rgba(94,236,255,0.025);
+    line-height: 3.5rem;
+    letter-spacing: 2rem;
+    word-break: break-all;
+    pointer-events: none;
+    animation: runeShift 20s linear infinite;
+}
+
+@keyframes runeShift {
+    0%   { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+}
+
+.spells-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.spells-header {
+    text-align: center;
+    margin-bottom: 3.5rem;
+}
+
+.spells-subtitle {
+    color: #666;
+    font-size: 0.92rem;
+    line-height: 1.8;
+    max-width: 580px;
+    margin: -1.5rem auto 2rem;
+}
+
+.spells-hint {
+    display: block;
+    margin-top: 0.5rem;
+    color: #5eecff;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    opacity: 0.7;
+}
+
+/* ── Filters ── */
+.spell-filters {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+}
+
+.sf-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1.2rem;
+    border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.03);
+    color: #666;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    letter-spacing: 0.04em;
+}
+
+.sf-btn:hover {
+    border-color: rgba(94,236,255,0.3);
+    color: #ccc;
+}
+
+.sf-btn.active {
+    background: rgba(94,236,255,0.1);
+    border-color: rgba(94,236,255,0.5);
+    color: #66bec9;
+}
+
+.rarity-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* ── Spell Grid ── */
+.spells-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+/* ── Individual Card ── */
+.spell-card {
+    perspective: 1000px;
+    height: 340px;
+    cursor: pointer;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.spell-card.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.9);
+    position: absolute;
+}
+
+.sc-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 18px;
+}
+
+.spell-card.unlocked .sc-inner {
+    transform: rotateY(180deg);
+}
+
+/* FRONT */
+.sc-front {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 18px;
+    background: linear-gradient(145deg, rgba(14,14,30,0.95), rgba(8,6,20,0.98));
+    border: 1px solid rgba(94,236,255,0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+}
+
+.spell-card:hover .sc-front {
+    border-color: rgba(94,236,255,0.4);
+    box-shadow: 0 0 30px rgba(94,236,255,0.08), inset 0 0 30px rgba(94,236,255,0.03);
+}
+
+/* Seal animation */
+.sc-seal {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sc-seal-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(94,236,255,0.25);
+}
+
+.sc-seal-ring.r1 {
+    width: 90px; height: 90px;
+    animation: sealSpin1 8s linear infinite;
+    border-style: dashed;
+}
+
+.sc-seal-ring.r2 {
+    width: 70px; height: 70px;
+    animation: sealSpin2 5s linear infinite reverse;
+}
+
+@keyframes sealSpin1 {
+    to { transform: rotate(360deg); }
+}
+@keyframes sealSpin2 {
+    to { transform: rotate(360deg); }
+}
+
+.sc-seal-core {
+    font-size: 0.65rem;
+    color: rgba(94,236,255,0.5);
+    letter-spacing: 0.05em;
+    text-align: center;
+    z-index: 1;
+    line-height: 1.4;
+    max-width: 56px;
+}
+
+.spell-card:hover .sc-seal-ring {
+    border-color: rgba(94,236,255,0.5);
+}
+
+/* Front rarity badge */
+.sc-front-rarity {
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.85rem;
+    border-radius: 20px;
+}
+
+.sc-front-rarity.useless   { color: #9ca3af; background: rgba(107,114,128,0.15); border: 1px solid rgba(107,114,128,0.3); }
+.sc-front-rarity.combat    { color: #60a5fa; background: rgba(59,130,246,0.12);  border: 1px solid rgba(59,130,246,0.3); }
+.sc-front-rarity.rare      { color: #c084fc; background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.3); }
+.sc-front-rarity.legendary { color: #fbbf24; background: rgba(251,191,36,0.12);  border: 1px solid rgba(251,191,36,0.3); }
+
+.sc-front-hint {
+    font-size: 0.7rem;
+    color: #3d3d5c;
+    letter-spacing: 0.08em;
+}
+
+/* Legendary card front — shimmer */
+.spell-card[data-rarity="legendary"] .sc-front {
+    border-color: rgba(251,191,36,0.2);
+}
+
+.spell-card[data-rarity="legendary"] .sc-front::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 40%, rgba(251,191,36,0.04) 50%, transparent 60%);
+    animation: legendaryShimmer 3s ease-in-out infinite;
+}
+
+@keyframes legendaryShimmer {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* BACK */
+.sc-back {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    transform: rotateY(180deg);
+    border-radius: 18px;
+    background: linear-gradient(145deg, rgba(10,10,24,0.98), rgba(6,4,16,1));
+    border: 1px solid var(--spell-color, #5eecff);
+    box-shadow: 0 0 30px var(--spell-glow, rgba(94,236,255,0.15)),
+                inset 0 0 40px rgba(0,0,0,0.5);
+    padding: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    overflow: hidden;
+}
+
+/* Particles on back */
+.sc-back-particles {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 80% 20%, var(--spell-glow, rgba(94,236,255,0.08)) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.sc-rarity-badge {
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 700;
+    position: relative;
+    z-index: 1;
+}
+
+.sc-rarity-badge.useless   { color: #6b7280; }
+.sc-rarity-badge.combat    { color: #60a5fa; }
+.sc-rarity-badge.rare      { color: #c084fc; }
+.sc-rarity-badge.legendary { color: #fbbf24; }
+
+.sc-symbol {
+    font-size: 1.8rem;
+    color: var(--spell-color, #5eecff);
+    opacity: 0.5;
+    line-height: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.sc-name {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--spell-color, #5eecff);
+    line-height: 1.1;
+    position: relative;
+    z-index: 1;
+}
+
+.sc-jp {
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 0.08em;
+    margin-top: -0.3rem;
+    position: relative;
+    z-index: 1;
+}
+
+.sc-effect {
+    font-size: 0.76rem;
+    line-height: 1.7;
+    color: #777;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.sc-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    position: relative;
+    z-index: 1;
+}
+
+.sc-tags span {
+    padding: 0.2rem 0.55rem;
+    border-radius: 10px;
+    font-size: 0.64rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #888;
+}
+
+.sc-user {
+    font-size: 0.66rem;
+    color: #444;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 0.5rem;
+    letter-spacing: 0.04em;
+    position: relative;
+    z-index: 1;
+}
+
+/* ── Counter ── */
+.spells-counter {
+    text-align: center;
+    font-size: 0.82rem;
+    color: #555;
+    letter-spacing: 0.08em;
+}
+
+.spells-counter span {
+    color: #5eecff;
+    font-weight: 700;
+}
+
+.spells-counter-bar {
+    width: 280px;
+    height: 3px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 2px;
+    margin: 0.75rem auto 0;
+    overflow: hidden;
+}
+
+.spells-counter-fill {
+    height: 100%;
+    background: linear-gradient(to right, #5eecff, #a78bfa);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.5s ease;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .spells-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 540px) {
+    .spells-grid { grid-template-columns: 1fr; }
+    .spell-card  { height: 320px; }
+}
