@@ -2307,3 +2307,103 @@ SPELL COLLECTION — FIXED CSS
 /* ── Responsive ── */
 @media (max-width: 900px) { .spells-grid { grid-template-columns: repeat(2,1fr); } }
 @media (max-width: 540px) { .spells-grid { grid-template-columns: 1fr; } .spell-card { height:320px; } }
+
+/* ============================================================
+ELECTRIC BORDER — CSS Additions
+Tambah di paling bawah style.css
+   ============================================================ */
+
+/* ── Identity card — siapkan untuk electric overflow ── */
+.identity-cards {
+    /* Perlu overflow visible agar canvas electric tidak terpotong */
+    overflow: visible !important;
+}
+
+.identity-card {
+    /* Electric canvas perlu overflow visible */
+    overflow: visible !important;
+    /* Background tetap solid supaya konten tidak tembus */
+    position: relative;
+}
+
+/* Konten dalam card tetap clipped rapi */
+.icard-img-wrap,
+.icard-content {
+    position: relative;
+    z-index: 1;
+}
+
+.icard-img-wrap {
+    overflow: hidden;
+    border-radius: 18px 18px 0 0;
+}
+
+/* ── Nama karakter sebagai link ── */
+.icard-name-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    text-decoration: none;
+    color: inherit;          /* warisi warna per karakter dari CSS var */
+    position: relative;
+    transition: all 0.25s ease;
+    cursor: pointer;
+}
+
+.icard-name-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1.5px;
+    background: currentColor;
+    transition: width 0.3s ease;
+    opacity: 0.6;
+}
+
+.icard-name-link:hover::after {
+    width: 100%;
+}
+
+.icard-name-link:hover {
+    opacity: 0.85;
+    transform: translateX(2px);
+}
+
+/* Arrow icon next to name */
+.icard-name-arrow {
+    font-size: 0.7em;
+    opacity: 0;
+    transform: translateY(-2px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    display: inline-block;
+}
+
+.icard-name-link:hover .icard-name-arrow {
+    opacity: 0.7;
+    transform: translateY(-3px);
+}
+
+/* Kalau URL masih '#' — tanda bahwa belum diisi */
+.icard-name-link[href="#"] .icard-name-arrow {
+    display: none;
+}
+
+.icard-name-link[href="#"] {
+    cursor: default;
+    pointer-events: none;   /* disable klik sampai URL diisi */
+}
+
+/* ── Hover state electric card — intensify glow ── */
+.identity-card:hover {
+    z-index: 10;    /* naik ke atas saat hover supaya canvas tidak tertimpa */
+}
+
+/* ── Override: pastikan electric canvas tidak menggeser layout ── */
+.identity-card > canvas.eb-canvas,
+.identity-card canvas {
+    pointer-events: none !important;
+    position: absolute !important;
+    z-index: 2 !important;
+}

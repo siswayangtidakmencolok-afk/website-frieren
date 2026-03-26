@@ -596,3 +596,345 @@ function animateBars(panel) {
     });
 
 })();
+
+// ============================================================
+// ELECTRIC BORDER — Vanilla JS Port dari React component
+// Credit: @BalintFerenczy | codepen.io/BalintFerenczy/pen/KwdoyEN
+// Tambah di paling bawah script.js
+// ============================================================
+
+// ──────────────────────────────────────────────────────────────
+// CONFIG — ISI URL KARAKTER DI SINI
+// Kalau karakter belum punya halaman, isi '#' atau biarkan ''
+// ──────────────────────────────────────────────────────────────
+const CHAR_URLS = {
+    frieren : '#',          // ganti dengan URL halaman Frieren
+    himmel  : '#',          // ganti dengan URL halaman Himmel
+    fern    : '#',          // ganti dengan URL halaman Fern
+    ubel    : '#',          // ganti dengan URL halaman Ubel
+};
+
+// Warna electric per karakter (hex)
+const CHAR_ELECTRIC_COLORS = {
+    frieren : '#5eecff',
+    himmel  : '#fbbf24',
+    fern    : '#a78bfa',
+    ubel    : '#f87171',
+};
+
+// ──────────────────────────────────────────────────────────────
+// ELECTRIC BORDER CLASS — konversi langsung dari React
+// ──────────────────────────────────────────────────────────────
+class ElectricBorder {
+    constructor(element, options = {}) {
+        this.el       = element;
+        this.color    = options.color      || '#5eecff';
+        this.speed    = options.speed      || 1;
+        this.chaos    = options.chaos      || 0.12;
+        this.radius   = options.radius     || 18;
+        this.raf      = null;
+        this.time     = 0;
+        this.lastTime = 0;
+
+        // Canvas config constants (sama persis dengan React versi)
+        this.octaves      = 10;
+        this.lacunarity   = 1.6;
+        this.gain         = 0.7;
+        this.frequency    = 10;
+        this.displacement = 60;
+        this.borderOffset = 60;
+
+        this._build();
+        this._observe();
+        this._start();
+    }
+
+    // Noise helpers — port langsung dari JS
+    _random(x) {
+        return ((Math.sin(x * 12.9898) * 43758.5453) % 1 + 1) % 1;
+    }
+
+    _noise2D(x, y) {
+        const i  = Math.floor(x), j  = Math.floor(y);
+        const fx = x - i,         fy = y - j;
+        const a  = this._random(i +     j * 57);
+        const b  = this._random(i + 1 + j * 57);
+        const c  = this._random(i +     (j + 1) * 57);
+        const d  = this._random(i + 1 + (j + 1) * 57);
+        const ux = fx * fx * (3 - 2 * fx);
+        const uy = fy * fy * (3 - 2 * fy);
+        return a*(1-ux)*(1-uy) + b*ux*(1-uy) + c*(1-ux)*uy + d*ux*uy;
+    }
+
+    _octavedNoise(x, time, seed) {
+        let y = 0, amp = this.chaos, freq = this.frequency;
+        for (let i = 0; i < this.octaves; i++) {
+            const a = i === 0 ? amp * 0 : amp;   // baseFlatness=0
+            y    += a * this._noise2D(freq * x + seed * 100, time * freq * 0.3);
+            freq *= this.lacunarity;
+            amp  *= this.gain;
+        }
+        return y;
+    }
+
+    _cornerPt(cx, cy, r, startAngle, arcLen, progress) {
+        const angle = startAngle + progress * arcLen;
+        return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+    }
+
+    _rectPoint(t, left, top, w, h, r) {
+        const sw = w - 2*r, sh = h - 2*r;
+        const ca = (Math.PI * r) / 2;
+        const total = 2*sw + 2*sh + 4*ca;
+        let d = t * total, acc = 0;
+
+        if (d <= acc + sw) return { x: left + r + (d/sw)*sw, y: top };
+        acc += sw;
+        if (d <= acc + ca) return this._cornerPt(left+w-r, top+r,   r, -Math.PI/2, Math.PI/2, (d-acc)/ca);
+        acc += ca;
+        if (d <= acc + sh) return { x: left+w, y: top+r+((d-acc)/sh)*sh };
+        acc += sh;
+        if (d <= acc + ca) return this._cornerPt(left+w-r, top+h-r, r, 0,          Math.PI/2, (d-acc)/ca);
+        acc += ca;
+        if (d <= acc + sw) return { x: left+w-r-((d-acc)/sw)*sw, y: top+h };
+        acc += sw;
+        if (d <= acc + ca) return this._cornerPt(left+r,   top+h-r, r, Math.PI/2,  Math.PI/2, (d-acc)/ca);
+        acc += ca;
+        if (d <= acc + sh) return { x: left, y: top+h-r-((d-acc)/sh)*sh };
+        acc += sh;
+        return this._cornerPt(left+r, top+r, r, Math.PI, Math.PI/2, (d-acc)/ca);
+    }
+
+    _build() {
+        // Wrapper styling
+        this.el.style.position = 'relative';
+        this.el.style.isolation = 'isolate';
+        this.el.style.overflow = 'visible';
+
+        // Canvas
+        this.canvas = document.createElement('canvas');
+        this.canvas.style.cssText = `
+            position:absolute;
+            top:50%; left:50%;
+            transform:translate(-50%,-50%);
+            pointer-events:none;
+            z-index:2;
+            display:block;
+        `;
+        this.el.appendChild(this.canvas);
+
+        // Glow layers
+        this.glowWrap = document.createElement('div');
+        this.glowWrap.style.cssText = `
+            position:absolute; inset:0;
+            border-radius:inherit;
+            pointer-events:none; z-index:0;
+        `;
+
+        const glow1 = document.createElement('div');
+        glow1.style.cssText = `
+            position:absolute; inset:0; border-radius:inherit;
+            border:2px solid ${this.color}99;
+            filter:blur(1px);
+        `;
+
+        const glow2 = document.createElement('div');
+        glow2.style.cssText = `
+            position:absolute; inset:0; border-radius:inherit;
+            border:2px solid ${this.color};
+            filter:blur(4px);
+        `;
+
+        const bgGlow = document.createElement('div');
+        bgGlow.style.cssText = `
+            position:absolute; inset:0; border-radius:inherit;
+            z-index:-1;
+            transform:scale(1.1);
+            filter:blur(32px);
+            opacity:0.25;
+            background:linear-gradient(-30deg, ${this.color}, transparent, ${this.color}88);
+        `;
+
+        this.glowWrap.append(glow1, glow2, bgGlow);
+        this.el.appendChild(this.glowWrap);
+
+        this.ctx = this.canvas.getContext('2d');
+        this._resize();
+    }
+
+    _resize() {
+        const rect = this.el.getBoundingClientRect();
+        const dpr  = Math.min(window.devicePixelRatio || 1, 2);
+        const boff = this.borderOffset;
+        const w    = rect.width  + boff * 2;
+        const h    = rect.height + boff * 2;
+
+        this.canvas.width  = w * dpr;
+        this.canvas.height = h * dpr;
+        this.canvas.style.width  = w + 'px';
+        this.canvas.style.height = h + 'px';
+        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        this._w = w; this._h = h;
+    }
+
+    _observe() {
+        this._ro = new ResizeObserver(() => this._resize());
+        this._ro.observe(this.el);
+    }
+
+    _draw(now) {
+        const dt = (now - this.lastTime) / 1000;
+        this.time    += dt * this.speed;
+        this.lastTime = now;
+
+        const ctx  = this.ctx;
+        const dpr  = Math.min(window.devicePixelRatio || 1, 2);
+        const boff = this.borderOffset;
+        const w    = this._w, h = this._h;
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.scale(dpr, dpr);
+
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth   = 1.5;
+        ctx.lineCap     = 'round';
+        ctx.lineJoin    = 'round';
+
+        const left  = boff, top = boff;
+        const bw    = w - 2*boff, bh = h - 2*boff;
+        const maxR  = Math.min(bw, bh) / 2;
+        const r     = Math.min(this.radius, maxR);
+        const perim = 2*(bw+bh) + 2*Math.PI*r;
+        const count = Math.floor(perim / 2);
+        const scale = this.displacement;
+
+        ctx.beginPath();
+        for (let i = 0; i <= count; i++) {
+            const progress = i / count;
+            const pt = this._rectPoint(progress, left, top, bw, bh, r);
+            const xN = this._octavedNoise(progress * 8, this.time, 0);
+            const yN = this._octavedNoise(progress * 8, this.time, 1);
+            const x  = pt.x + xN * scale;
+            const y  = pt.y + yN * scale;
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+
+        this.raf = requestAnimationFrame(t => this._draw(t));
+    }
+
+    _start() {
+        this.raf = requestAnimationFrame(t => {
+            this.lastTime = t;
+            this._draw(t);
+        });
+    }
+
+    destroy() {
+        cancelAnimationFrame(this.raf);
+        this._ro.disconnect();
+        this.canvas.remove();
+        this.glowWrap.remove();
+    }
+
+    // Update color at runtime
+    setColor(c) {
+        this.color = c;
+        // Update glow divs
+        const divs = this.glowWrap.children;
+        if (divs[0]) divs[0].style.border = `2px solid ${c}99`;
+        if (divs[1]) divs[1].style.border = `2px solid ${c}`;
+        if (divs[2]) divs[2].style.background = `linear-gradient(-30deg, ${c}, transparent, ${c}88)`;
+    }
+}
+
+// ──────────────────────────────────────────────────────────────
+// TERAPKAN KE IDENTITY CARDS
+// ──────────────────────────────────────────────────────────────
+(function applyElectricToIdentityCards() {
+    const cards = document.querySelectorAll('.identity-card');
+    if (!cards.length) {
+        console.warn('[Electric] .identity-card tidak ditemukan');
+        return;
+    }
+
+    cards.forEach(card => {
+        const charKey = card.dataset.char?.toLowerCase();
+        const color   = CHAR_ELECTRIC_COLORS[charKey] || '#5eecff';
+
+        // 1. Pasang Electric Border — hanya aktif saat hover
+        let eb = null;
+
+        card.addEventListener('mouseenter', () => {
+            if (!eb) {
+                eb = new ElectricBorder(card, {
+                    color  : color,
+                    speed  : 0.8,
+                    chaos  : 0.14,
+                    radius : 18,
+                });
+            }
+        });
+
+        // Lazy: buat electric saat halaman sudah siap (bukan hanya hover)
+        // agar efeknya sudah ada saat pertama kali visible
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting && !eb) {
+                    eb = new ElectricBorder(card, {
+                        color  : color,
+                        speed  : 0.6,
+                        chaos  : 0.12,
+                        radius : 18,
+                    });
+                    io.unobserve(card);
+                }
+            });
+        }, { threshold: 0.2 });
+        io.observe(card);
+
+        // 2. Buat nama karakter jadi link yang bisa diklik
+        const nameEl = card.querySelector('.icard-name');
+        if (nameEl && charKey && CHAR_URLS[charKey] !== undefined) {
+            const originalText = nameEl.textContent;
+            const url = CHAR_URLS[charKey];
+
+            // Ganti isi jadi <a> — styling diatur CSS
+            nameEl.innerHTML = `
+                <a href="${url || '#'}"
+                   class="icard-name-link"
+                   target="${url && url !== '#' ? '_blank' : '_self'}"
+                   rel="noopener noreferrer"
+                   data-char="${charKey}"
+                   title="Halaman ${originalText}">
+                    ${originalText}
+                    <span class="icard-name-arrow">↗</span>
+                </a>
+            `;
+
+            // Prevent card click buka modal saat klik nama
+            nameEl.querySelector('a')?.addEventListener('click', e => {
+                e.stopPropagation();
+                if (!url || url === '#') e.preventDefault();
+            });
+        }
+    });
+
+    console.log('[Electric] Applied to', cards.length, 'identity cards');
+})();
+
+// ──────────────────────────────────────────────────────────────
+// HELPER — lo bisa panggil ini dari console untuk update URL
+// contoh: setCharUrl('frieren', 'https://example.com/frieren')
+// ──────────────────────────────────────────────────────────────
+function setCharUrl(charKey, url) {
+    CHAR_URLS[charKey] = url;
+    const link = document.querySelector(`.icard-name-link[data-char="${charKey}"]`);
+    if (link) {
+        link.href   = url;
+        link.target = url && url !== '#' ? '_blank' : '_self';
+        console.log(`[Electric] URL ${charKey} diupdate: ${url}`);
+    }
+}
