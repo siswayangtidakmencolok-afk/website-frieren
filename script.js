@@ -1558,3 +1558,182 @@ console.log('⌨  Arrow keys: navigate character slider');
     animate();
     console.log('✨ Efek Mana Release (Aura Frieren) aktif');
 })();
+
+// ──────────────────────────────────────────────────────────────
+// 18. SPELL CAROUSEL LOGIC & DRAG TO SCROLL
+// ──────────────────────────────────────────────────────────────
+(function initSpellCarousel() {
+    const spellGrid = document.getElementById('spellsGrid');
+    const spellPrev = document.getElementById('spellPrev');
+    const spellNext = document.getElementById('spellNext');
+
+    if (!spellGrid) return;
+
+    // Mouse drag support for desktop
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    spellGrid.addEventListener('mousedown', (e) => {
+        isDown = true;
+        spellGrid.style.cursor = 'grabbing';
+        spellGrid.style.scrollSnapType = 'none'; // release snapping for drag
+        startX = e.pageX - spellGrid.offsetLeft;
+        scrollLeft = spellGrid.scrollLeft;
+    });
+
+    spellGrid.addEventListener('mouseleave', () => {
+        isDown = false;
+        spellGrid.style.cursor = 'grab';
+        spellGrid.style.scrollSnapType = 'x mandatory';
+    });
+
+    spellGrid.addEventListener('mouseup', () => {
+        isDown = false;
+        spellGrid.style.cursor = 'grab';
+        spellGrid.style.scrollSnapType = 'x mandatory';
+    });
+
+    spellGrid.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - spellGrid.offsetLeft;
+        const walk = (x - startX) * 1.5; // Scroll-fast multiplier
+        spellGrid.scrollLeft = scrollLeft - walk;
+    });
+
+    if (spellPrev && spellNext) {
+        spellPrev.addEventListener('click', () => {
+            const cardWidth = spellGrid.querySelector('.spell-card')?.offsetWidth || 300;
+            spellGrid.scrollBy({ left: -(cardWidth + 24), behavior: 'smooth' });
+        });
+        spellNext.addEventListener('click', () => {
+            const cardWidth = spellGrid.querySelector('.spell-card')?.offsetWidth || 300;
+            spellGrid.scrollBy({ left: cardWidth + 24, behavior: 'smooth' });
+        });
+    }
+})();
+
+// ──────────────────────────────────────────────────────────────
+// 19. MAGNETIC BUTTON HOVER EFFECT (Premium Aesthetics)
+// ──────────────────────────────────────────────────────────────
+(function initMagneticButtons() {
+    const magnets = document.querySelectorAll('.rn-btn, .spell-nav-btn, .btn-mal, .char-tab');
+    magnets.forEach(btn => {
+        btn.addEventListener('mousemove', (e) => {
+            const rect = btn.getBoundingClientRect();
+            const h = rect.width / 2;
+            const x = e.clientX - rect.left - h;
+            const y = e.clientY - rect.top - h;
+            btn.style.transform = `translate(${x * 0.25}px, ${y * 0.25}px)`;
+        });
+        btn.addEventListener('mouseleave', () => {
+            btn.style.transform = `translate(0px, 0px)`;
+            btn.style.transition = `transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)`;
+        });
+        btn.addEventListener('mouseenter', () => {
+            btn.style.transition = `none`;
+        });
+    });
+})();
+
+// ──────────────────────────────────────────────────────────────
+// 20. GLOBAL MAGIC DUST & HYPER-SCROLL EFFECT
+// ──────────────────────────────────────────────────────────────
+(function initGlobalMagicDust() {
+    // Inject a performant fullscreen canvas overlay for magic background dust
+    const canvas = document.createElement('canvas');
+    Object.assign(canvas.style, {
+        position: 'fixed',
+        inset: '0',
+        width: '100vw',
+        height: '100vh',
+        pointerEvents: 'none',
+        zIndex: '9999',
+        mixBlendMode: 'screen',
+        opacity: '0.6'
+    });
+    document.body.appendChild(canvas);
+    
+    const ctx = canvas.getContext('2d');
+    let W, H;
+    let particles = [];
+    let scrollY = window.scrollY;
+    let scrollSpeed = 0;
+
+    function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    window.addEventListener('scroll', () => {
+        const newScroll = window.scrollY;
+        scrollSpeed = newScroll - scrollY;
+        scrollY = newScroll;
+    });
+
+    class MagicDust {
+        constructor() {
+            this.x = Math.random() * W;
+            this.y = Math.random() * H;
+            this.size = Math.random() * 1.5 + 0.5;
+            this.vx = (Math.random() - 0.5) * 0.5;
+            this.vy = -Math.random() * 0.5 - 0.2;
+            this.hue = 180 + Math.random() * 60; // cyan to blue
+        }
+        update() {
+            // Apply wind resistance from scrolling
+            this.y -= scrollSpeed * (0.1 + this.size * 0.1);
+            
+            this.x += this.vx;
+            this.y += this.vy;
+
+            // Screen Wrap
+            if (this.y < -100) this.y = H + 50;
+            if (this.y > H + 100) this.y = -50;
+            if (this.x < 0) this.x = W + 10;
+            if (this.x > W + 10) this.x = 0;
+        }
+        draw(ctx) {
+            const stretch = Math.max(1, Math.abs(scrollSpeed * 0.1));
+            ctx.beginPath();
+            if (stretch > 1.5) {
+                // Streak effect (warp speed when scroll fast)
+                ctx.moveTo(this.x, this.y);
+                const endY = this.y + (scrollSpeed > 0 ? stretch * 10 : -stretch * 10);
+                ctx.lineTo(this.x, endY);
+                ctx.strokeStyle = `hsla(${this.hue}, 100%, 75%, 0.8)`;
+                ctx.lineWidth = this.size;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            } else {
+                // Normal glow dot
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `hsla(${this.hue}, 100%, 75%, 0.8)`;
+                ctx.fill();
+            }
+        }
+    }
+
+    // Hanya merender max 40 debu ajaib (Sangat Stabil / Ringan)
+    for (let i = 0; i < 40; i++) {
+        particles.push(new MagicDust());
+    }
+
+    function animate() {
+        // Momentum Scroll Speed Decay (Dampening)
+        scrollSpeed *= 0.85;
+        
+        ctx.clearRect(0, 0, W, H);
+        particles.forEach(p => {
+            p.update();
+            p.draw(ctx);
+        });
+        requestAnimationFrame(animate);
+    }
+    
+    animate();
+    console.log('✨ Magic Global Wind Engine actived (Ultra-Performant Premium)');
+})();
