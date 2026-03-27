@@ -1,480 +1,519 @@
-// Auto Scroll Image Slider
-// 1. Perbaikan Infinite Scroll (Auto Slider Atas)
-const imageSlider = document.getElementById('imageSlider');
-if (imageSlider) {
-    const slides = imageSlider.children;
-    const total = slides.length;
-    // Kloning semua elemen untuk memastikan animasi mulus
-    for(let i=0; i<total; i++) {
+
+// ============================================================
+// FRIEREN WEBSITE — FULL SCRIPT
+// Premium Hero Cinematic + All Sections Fixed
+// ============================================================
+
+'use strict';
+
+// ──────────────────────────────────────────────────────────────
+// 1. CINEMATIC HERO — Parallax + Particle Canvas + Mouse Aura
+// ──────────────────────────────────────────────────────────────
+(function initCinematicHero() {
+    const hero       = document.querySelector('.hero');
+    const layerSky   = document.getElementById('heroLayerSky');
+    const layerFog   = document.getElementById('heroLayerFog');
+    const layerChar  = document.getElementById('heroLayerChar');
+    const layerAura  = document.getElementById('heroCharAura');
+    const vignette   = document.getElementById('heroVignette');
+    const canvas     = document.getElementById('heroCanvas');
+
+    if (!hero) return;
+
+    // ── Mouse parallax ──
+    let mouseX = 0.5, mouseY = 0.5;
+    let targetX = 0.5, targetY = 0.5;
+    let rafId;
+
+    hero.addEventListener('mousemove', (e) => {
+        const rect = hero.getBoundingClientRect();
+        targetX = (e.clientX - rect.left) / rect.width;
+        targetY = (e.clientY - rect.top)  / rect.height;
+
+        // Vignette follow
+        if (vignette) {
+            vignette.style.setProperty('--mx', (targetX * 100) + '%');
+            vignette.style.setProperty('--my', (targetY * 100) + '%');
+        }
+    });
+
+    hero.addEventListener('mouseleave', () => {
+        targetX = 0.5;
+        targetY = 0.5;
+    });
+
+    function tickParallax() {
+        // Lerp smooth
+        mouseX += (targetX - mouseX) * 0.06;
+        mouseY += (targetY - mouseY) * 0.06;
+
+        const dx = (mouseX - 0.5);
+        const dy = (mouseY - 0.5);
+
+        // Sky — slowest, subtle movement
+        if (layerSky) {
+            layerSky.style.transform = `translate(${dx * -18}px, ${dy * -12}px) scale(1.08)`;
+        }
+
+        // Fog — slightly faster
+        if (layerFog) {
+            layerFog.style.transform = `translate(${dx * -10}px, ${dy * -7}px)`;
+        }
+
+        // Character — medium speed, plus subtle scale breathe
+        if (layerChar) {
+            layerChar.style.transform = `translate(${dx * 14}px, ${dy * 8}px)`;
+        }
+
+        // Aura — follows char but with more spread
+        if (layerAura) {
+            layerAura.style.transform = `translate(${dx * 20}px, ${dy * 14}px)`;
+        }
+
+        rafId = requestAnimationFrame(tickParallax);
+    }
+    rafId = requestAnimationFrame(tickParallax);
+
+    // ── Scroll parallax on top of mouse parallax ──
+    window.addEventListener('scroll', () => {
+        const scrollY = window.pageYOffset;
+        const heroH   = hero.offsetHeight;
+        if (scrollY > heroH) return;
+
+        const progress = scrollY / heroH;
+
+        if (layerSky)  layerSky.style.marginTop  = (scrollY * 0.3) + 'px';
+        if (layerChar) {
+            const charImg = layerChar.querySelector('img');
+            if (charImg) charImg.style.marginTop = (scrollY * 0.15) + 'px';
+        }
+    }, { passive: true });
+
+    // ── Particle canvas ──
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let W, H;
+    const particles = [];
+
+    function resizeCanvas() {
+        W = canvas.width  = hero.offsetWidth;
+        H = canvas.height = hero.offsetHeight;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Spawn floating mana particles
+    function spawnParticle() {
+        return {
+            x    : Math.random() * W,
+            y    : H + 20,
+            vx   : (Math.random() - 0.5) * 0.6,
+            vy   : -(0.4 + Math.random() * 1.2),
+            r    : 0.6 + Math.random() * 2,
+            life : 0,
+            maxL : 120 + Math.random() * 180,
+            hue  : Math.random() > 0.5 ? 195 : (Math.random() > 0.5 ? 270 : 320),
+            sat  : 70 + Math.random() * 30,
+        };
+    }
+
+    function drawParticles() {
+        ctx.clearRect(0, 0, W, H);
+
+        if (particles.length < 60 && Math.random() < 0.4) {
+            particles.push(spawnParticle());
+        }
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            p.x   += p.vx;
+            p.y   += p.vy;
+            p.life++;
+
+            const progress = p.life / p.maxL;
+            const alpha    = Math.sin(progress * Math.PI) * 0.55;
+
+            // Glowing circle
+            const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3);
+            gradient.addColorStop(0, `hsla(${p.hue}, ${p.sat}%, 75%, ${alpha})`);
+            gradient.addColorStop(1, `hsla(${p.hue}, ${p.sat}%, 75%, 0)`);
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            if (p.life >= p.maxL) particles.splice(i, 1);
+        }
+
+        requestAnimationFrame(drawParticles);
+    }
+
+    drawParticles();
+
+    // ── Breathing aura on character ──
+    const charImg = layerChar?.querySelector('img');
+    if (charImg) {
+        let breatheT = 0;
+        function breathe() {
+            breatheT += 0.008;
+            const scale   = 1 + Math.sin(breatheT) * 0.008;
+            const bright  = 0.85 + Math.sin(breatheT * 1.3) * 0.05;
+            charImg.style.filter    = `brightness(${bright}) saturate(1.1)`;
+            charImg.style.transform = `scale(${scale})`;
+            requestAnimationFrame(breathe);
+        }
+        breathe();
+    }
+
+    console.log('[Hero] Cinematic parallax aktif');
+})();
+
+
+// ──────────────────────────────────────────────────────────────
+// 2. AUTO SCROLL IMAGE SLIDER (top section)
+// ──────────────────────────────────────────────────────────────
+(function initImageSlider() {
+    const imageSlider = document.getElementById('imageSlider');
+    if (!imageSlider) return;
+
+    const slides = Array.from(imageSlider.children);
+    const total  = slides.length;
+
+    // Clone for seamless infinite scroll
+    for (let i = 0; i < total; i++) {
         const clone = slides[i].cloneNode(true);
         imageSlider.appendChild(clone);
     }
-}
-
-// Characters Slider dengan Controls
-const charactersSlider = document.getElementById('charactersSlider');
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
-const dotsContainer = document.getElementById('sliderDots');
-
-let currentSlide = 0;
-const cards = document.querySelectorAll('.character-card');
-const totalSlides = cards.length;
-
-// Create dots
-function createDots() {
-    for (let i = 0; i < totalSlides; i++) {
-        const dot = document.createElement('div');
-        dot.classList.add('dot');
-        if (i === 0) dot.classList.add('active');
-        dot.addEventListener('click', () => goToSlide(i));
-        dotsContainer.appendChild(dot);
-    }
-}
-
-// Update dots
-function updateDots() {
-    const dots = document.querySelectorAll('.dot');
-    dots.forEach((dot, index) => {
-        dot.classList.toggle('active', index === currentSlide);
-    });
-}
-
-// Go to specific slide
-function goToSlide(slideIndex) {
-    if(!charactersSlider) return;
-    currentSlide = slideIndex;
-    const cardWidth = cards[0].offsetWidth + 32; // 32 adalah gap 2rem
-    
-    charactersSlider.scrollTo({
-        left: cardWidth * currentSlide,
-        behavior: 'smooth'
-    });
-    updateDots();
-}
-
-
-// Next slide
-function nextSlide() {
-    currentSlide = (currentSlide + 1) % totalSlides;
-    goToSlide(currentSlide);
-}
-
-// Previous slide
-function prevSlide() {
-    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-    goToSlide(currentSlide);
-}
-
-// Event listeners for buttons
-if (prevBtn) prevBtn.addEventListener('click', prevSlide);
-if (nextBtn) nextBtn.addEventListener('click', nextSlide);
-
-// Initialize dots
-if (dotsContainer) createDots();
-
-// Auto slide every 5 seconds
-let autoSlideInterval = setInterval(nextSlide, 5000);
-
-// Pause auto slide on hover
-if (charactersSlider) {
-    charactersSlider.addEventListener('mouseenter', () => {
-        clearInterval(autoSlideInterval);
-    });
-
-    charactersSlider.addEventListener('mouseleave', () => {
-        autoSlideInterval = setInterval(nextSlide, 5000);
-    });
-}
-
-// Smooth scroll on scroll event
-let isScrolling;
-charactersSlider?.addEventListener('scroll', () => {
-    window.clearTimeout(isScrolling);
-    isScrolling = setTimeout(() => {
-        const cardWidth = cards[0].offsetWidth + 32;
-        currentSlide = Math.round(charactersSlider.scrollLeft / cardWidth);
-        updateDots();
-    }, 100);
-});
-
-// Parallax Effect on Scroll
-window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const heroImage = document.querySelector('.hero-image');
-    if (heroImage) {
-        // Gunakan requestAnimationFrame untuk performa 60fps
-        window.requestAnimationFrame(() => {
-            heroImage.style.transform = `translateY(${scrolled * 0.15}px)`;
-        });
-    }
-});
-
-// Intersection Observer for Fade In Animations
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-        }
-    });
-}, observerOptions);
-
-// Observe all sections
-document.querySelectorAll('.characters-section, .gallery-section').forEach(section => {
-    section.style.opacity = '0';
-    section.style.transform = 'translateY(50px)';
-    section.style.transition = 'all 0.8s ease';
-    observer.observe(section);
-});
-
-// Gallery Item Animations
-const galleryItems = document.querySelectorAll('.gallery-item');
-galleryItems.forEach((item, index) => {
-    item.style.opacity = '0';
-    item.style.transform = 'scale(0.9)';
-    item.style.transition = `all 0.5s ease ${index * 0.1}s`;
-    
-    const galleryObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'scale(1)';
-            }
-        });
-    }, observerOptions);
-    
-    galleryObserver.observe(item);
-});
-
-// Smooth scroll for all links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
-});
-
-// Add mouse move effect on hero
-const hero = document.querySelector('.hero');
-if (hero) {
-    hero.addEventListener('mousemove', (e) => {
-        const mouseX = e.clientX / window.innerWidth;
-        const mouseY = e.clientY / window.innerHeight;
-        
-        const heroImage = document.querySelector('.hero-image');
-        if (heroImage) {
-            heroImage.style.transform = `translate(${mouseX * 20}px, ${mouseY * 20}px)`;
-        }
-    });
-}
-
-// Keyboard navigation for character slider
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft') {
-        prevSlide();
-    } else if (e.key === 'ArrowRight') {
-        nextSlide();
-    }
-});
-
-// Touch swipe for mobile
-let touchStartX = 0;
-let touchEndX = 0;
-
-if (charactersSlider) {
-    charactersSlider.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-    });
-
-    charactersSlider.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-    });
-}
-
-function handleSwipe() {
-    if (touchEndX < touchStartX - 50) {
-        nextSlide();
-    }
-    if (touchEndX > touchStartX + 50) {
-        prevSlide();
-    }
-}
-
-// Loading animation
-window.addEventListener('load', () => {
-    document.body.style.opacity = '0';
-    document.body.style.transition = 'opacity 0.5s ease';
-    setTimeout(() => {
-        document.body.style.opacity = '1';
-    }, 100);
-});
-
-// Add cursor trail effect (optional, modern effect)
-const createCursorTrail = () => {
-    const trail = document.createElement('div');
-    trail.className = 'cursor-trail';
-    trail.style.cssText = `
-        position: fixed;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(94, 236, 255, 0.8), transparent);
-        pointer-events: none;
-        z-index: 9999;
-        transition: transform 0.1s ease;
-    `;
-    document.body.appendChild(trail);
-    return trail;
-};
-
-let trails = [];
-for (let i = 0; i < 5; i++) {
-    trails.push(createCursorTrail());
-}
-
-document.addEventListener('mousemove', (e) => {
-    trails.forEach((trail, index) => {
-        setTimeout(() => {
-            trail.style.left = e.clientX - 5 + 'px';
-            trail.style.top = e.clientY - 5 + 'px';
-            trail.style.transform = `scale(${1 - index * 0.2})`;
-            trail.style.opacity = 1 - index * 0.2;
-        }, index * 50);
-    });
-});
-
-console.log('🚀 Website loaded successfully!');
-console.log('✨ All animations are active');
-console.log('⌨️  Use Arrow Keys to navigate character slider');
-
-// ===== PROFIL IDENTITAS TOGGLE =====
-const identityToggle = document.getElementById('identityToggle');
-const identityCards  = document.getElementById('identityCards');
-const identityBlock  = identityToggle?.closest('.identity-block');
-
-if (identityToggle && identityCards) {
-    identityToggle.addEventListener('click', function () {
-        const isOpen = identityCards.classList.contains('open');
-
-        identityCards.classList.toggle('open');
-        identityToggle.classList.toggle('active');
-        identityToggle.setAttribute('aria-expanded', String(!isOpen));
-        identityBlock?.classList.toggle('revealed');
-    });
-
-    // Ripple effect on toggle button
-    identityToggle.addEventListener('mousemove', (e) => {
-        const rect = identityToggle.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        identityToggle.style.setProperty('--x', x + '%');
-        identityToggle.style.setProperty('--y', y + '%');
-    });
-}
-// ===== END IDENTITY TOGGLE =====
-
-// ===== JIKAN API - ANIME INFO MODAL =====
-const MAL_ID = 52991; // Frieren: Beyond Journey's End
-const JIKAN_URL = `https://api.jikan.moe/v4/anime/${MAL_ID}/full`;
-
-const btnInfoDetail    = document.getElementById('btnInfoDetail');
-const animeInfoModal   = document.getElementById('animeInfoModal');
-const closeAnimeModal  = document.getElementById('closeAnimeModal');
-const animeLoading     = document.getElementById('animeLoading');
-const animeModalContent= document.getElementById('animeModalContent');
-const animeError       = document.getElementById('animeError');
-const animeRetry       = document.getElementById('animeRetry');
-
-let animeDataCache = null;
-
-async function fetchAnimeData() {
-    // Pakai cache supaya tidak hit API berulang kali
-    if (animeDataCache) {
-        renderAnimeModal(animeDataCache);
-        return;
-    }
-
-    // Reset state
-    animeLoading.style.display      = 'flex';
-    animeModalContent.style.display = 'none';
-    animeError.style.display        = 'none';
-
-    try {
-        const res = await fetch(JIKAN_URL);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
-        animeDataCache = json.data;
-        renderAnimeModal(animeDataCache);
-    } catch (err) {
-        console.error('Jikan API error:', err);
-        animeLoading.style.display = 'none';
-        animeError.style.display   = 'block';
-    }
-}
-
-function renderAnimeModal(data) {
-    // Poster
-    document.getElementById('animeModalImg').src = data.images?.jpg?.large_image_url || '';
-
-    // Badges
-    const badges = document.getElementById('animeBadges');
-    badges.innerHTML = `
-        <span class="badge-status badge-tag">${data.status || 'N/A'}</span>
-        <span class="badge-type badge-tag">${data.type || 'N/A'}</span>
-        <span class="badge-year badge-tag">${data.year || data.aired?.prop?.from?.year || 'N/A'}</span>
-    `;
-
-    // Title
-    document.getElementById('animeModalTitle').textContent    = data.title_japanese || data.title;
-    document.getElementById('animeModalTitleEn').textContent  = data.title_english || data.title;
-
-    // Stats
-    const stats = document.getElementById('animeStats');
-    stats.innerHTML = `
-        <div class="anime-stat">
-            <span class="anime-stat-label">⭐ Score</span>
-            <span class="anime-stat-value">${data.score ?? 'N/A'}</span>
-        </div>
-        <div class="anime-stat">
-            <span class="anime-stat-label">📺 Episode</span>
-            <span class="anime-stat-value">${data.episodes ?? '?'}</span>
-        </div>
-        <div class="anime-stat">
-            <span class="anime-stat-label">📊 Rank</span>
-            <span class="anime-stat-value">#${data.rank ?? 'N/A'}</span>
-        </div>
-        <div class="anime-stat">
-            <span class="anime-stat-label">⏱ Durasi</span>
-            <span class="anime-stat-value">${data.duration?.replace(' per ep','') ?? 'N/A'}</span>
-        </div>
-        <div class="anime-stat">
-            <span class="anime-stat-label">🔞 Rating</span>
-            <span class="anime-stat-value">${data.rating?.split(' -')[0] ?? 'N/A'}</span>
-        </div>
-    `;
-
-    // Synopsis — potong kalau terlalu panjang
-    const rawSynopsis = data.synopsis || 'Tidak ada sinopsis.';
-    const synopsis = rawSynopsis.replace(/\[Written by MAL Rewrite\]/g, '').trim();
-    document.getElementById('animeModalSynopsis').textContent = synopsis;
-
-    // Genres
-    const genreWrap = document.getElementById('animeGenres');
-    const allTags = [
-        ...(data.genres || []),
-        ...(data.themes || []),
-        ...(data.demographics || [])
-    ];
-    genreWrap.innerHTML = allTags
-        .map(g => `<span class="genre-tag">${g.name}</span>`)
-        .join('');
-
-    // MAL Link
-    document.getElementById('animeMALLink').href = data.url || `https://myanimelist.net/anime/${MAL_ID}`;
-
-    // Show content
-    animeLoading.style.display      = 'none';
-    animeModalContent.style.display = 'block';
-}
-
-// Open modal
-function openAnimeModal() {
-    animeInfoModal.classList.add('open');
-    document.body.style.overflow = 'hidden';
-    fetchAnimeData();
-}
-
-// Close modal
-function closeModal() {
-    animeInfoModal.classList.remove('open');
-    document.body.style.overflow = '';
-}
-
-if (btnInfoDetail)  btnInfoDetail.addEventListener('click', openAnimeModal);
-if (closeAnimeModal) closeAnimeModal.addEventListener('click', closeModal);
-if (animeRetry)     animeRetry.addEventListener('click', () => {
-    animeDataCache = null;
-    fetchAnimeData();
-});
-
-// Close on overlay click
-animeInfoModal?.addEventListener('click', (e) => {
-    if (e.target === animeInfoModal) closeModal();
-});
-
-// Close on Escape
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeModal();
-});
-// ===== END JIKAN API =====
-
-// ============================================================
-// TAMBAH DI PALING BAWAH script.js
-// ============================================================
-
-// ── CHARACTER TABS ──
-(function initCharTabs() {
-    const tabs  = document.querySelectorAll('.char-tab');
-    const panels= document.querySelectorAll('.char-panel');
-    if (!tabs.length) return;
-
-    function activateTab(charKey) {
-        tabs.forEach(t => t.classList.toggle('active', t.dataset.char === charKey));
-        panels.forEach(p => {
-            const isTarget = p.dataset.panel === charKey;
-            p.classList.toggle('active', isTarget);
-            if (isTarget) animateBars(p);
-        });
-    }
-
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => activateTab(tab.dataset.char));
-    });
-
-    // Animate bars on first visible panel
-    animateBars(document.querySelector('.char-panel.active'));
 })();
 
-// ── ANIMATE POWER BARS ──
-function animateBars(panel) {
-    if (!panel) return;
-    // Reset first
-    panel.querySelectorAll('.cpb-fill').forEach(fill => {
-        fill.classList.remove('animated');
+
+// ──────────────────────────────────────────────────────────────
+// 3. CHARACTER CARDS SLIDER (old-style horizontal scroll)
+// ──────────────────────────────────────────────────────────────
+(function initCharactersSlider() {
+    const slider       = document.getElementById('charactersSlider');
+    const prevBtn      = document.getElementById('prevBtn');
+    const nextBtn      = document.getElementById('nextBtn');
+    const dotsContainer= document.getElementById('sliderDots');
+
+    if (!slider) return;
+
+    const cards       = slider.querySelectorAll('.character-card');
+    const totalSlides = cards.length;
+    let currentSlide  = 0;
+    let autoSlide;
+
+    // Create dots
+    if (dotsContainer) {
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (i === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(i));
+            dotsContainer.appendChild(dot);
+        }
+    }
+
+    function updateDots() {
+        const dots = dotsContainer?.querySelectorAll('.dot') || [];
+        dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+    }
+
+    function goToSlide(idx) {
+        if (!cards.length) return;
+        currentSlide = idx;
+        const cardWidth = cards[0].offsetWidth + 32;
+        slider.scrollTo({ left: cardWidth * idx, behavior: 'smooth' });
+        updateDots();
+    }
+
+    if (prevBtn) prevBtn.addEventListener('click', () => {
+        currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+        goToSlide(currentSlide);
     });
-    // Trigger reflow then animate
+
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        currentSlide = (currentSlide + 1) % totalSlides;
+        goToSlide(currentSlide);
+    });
+
+    autoSlide = setInterval(() => {
+        currentSlide = (currentSlide + 1) % totalSlides;
+        goToSlide(currentSlide);
+    }, 5000);
+
+    slider.addEventListener('mouseenter', () => clearInterval(autoSlide));
+    slider.addEventListener('mouseleave', () => {
+        autoSlide = setInterval(() => {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            goToSlide(currentSlide);
+        }, 5000);
+    });
+
+    // Sync dots on manual scroll
+    let scrollTimer;
+    slider.addEventListener('scroll', () => {
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(() => {
+            if (!cards.length) return;
+            const cardWidth  = cards[0].offsetWidth + 32;
+            currentSlide = Math.round(slider.scrollLeft / cardWidth);
+            updateDots();
+        }, 100);
+    });
+
+    // Touch swipe
+    let touchStartX = 0;
+    slider.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    slider.addEventListener('touchend', (e) => {
+        const diff = e.changedTouches[0].screenX - touchStartX;
+        if (diff < -50) { currentSlide = (currentSlide + 1) % totalSlides; goToSlide(currentSlide); }
+        if (diff >  50) { currentSlide = (currentSlide - 1 + totalSlides) % totalSlides; goToSlide(currentSlide); }
+    });
+})();
+
+
+// ──────────────────────────────────────────────────────────────
+// 4. SCROLL FADE-IN — global observer
+// ──────────────────────────────────────────────────────────────
+(function initScrollFade() {
+    const targets = document.querySelectorAll('.gallery-item, .gallery-section, .characters-section');
+
+    const obs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity   = '1';
+                entry.target.style.transform = 'translateY(0) scale(1)';
+                obs.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.08, rootMargin: '0px 0px -50px 0px' });
+
+    targets.forEach((el, i) => {
+        el.style.opacity    = '0';
+        el.style.transform  = el.classList.contains('gallery-item') ? 'scale(0.92)' : 'translateY(40px)';
+        el.style.transition = `opacity 0.7s ease ${i * 0.06}s, transform 0.7s ease ${i * 0.06}s`;
+        obs.observe(el);
+    });
+})();
+
+
+// ──────────────────────────────────────────────────────────────
+// 5. SMOOTH SCROLL for anchor links
+// ──────────────────────────────────────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+
+
+// ──────────────────────────────────────────────────────────────
+// 6. CURSOR TRAIL (premium sparkle)
+// ──────────────────────────────────────────────────────────────
+(function initCursorTrail() {
+    const TRAIL_COUNT = 8;
+    const trails = [];
+
+    for (let i = 0; i < TRAIL_COUNT; i++) {
+        const el = document.createElement('div');
+        el.style.cssText = `
+            position:fixed; pointer-events:none; z-index:9999;
+            border-radius:50%; mix-blend-mode:screen;
+            background: radial-gradient(circle, rgba(94,236,255,${0.7 - i*0.08}), transparent);
+            width:${12 - i}px; height:${12 - i}px;
+            transform:translate(-50%,-50%);
+            transition: left ${i*55}ms ease, top ${i*55}ms ease;
+            will-change: left, top;
+        `;
+        document.body.appendChild(el);
+        trails.push(el);
+    }
+
+    document.addEventListener('mousemove', (e) => {
+        trails.forEach((el, i) => {
+            setTimeout(() => {
+                el.style.left = e.clientX + 'px';
+                el.style.top  = e.clientY + 'px';
+                el.style.opacity = (1 - i / TRAIL_COUNT) * 0.7;
+            }, i * 30);
+        });
+    });
+})();
+
+
+// ──────────────────────────────────────────────────────────────
+// 7. PROFIL IDENTITAS TOGGLE
+// ──────────────────────────────────────────────────────────────
+(function initIdentityToggle() {
+    const toggle = document.getElementById('identityToggle');
+    const cards  = document.getElementById('identityCards');
+    const block  = toggle?.closest('.identity-block');
+
+    if (!toggle || !cards) return;
+
+    toggle.addEventListener('click', () => {
+        const isOpen = cards.classList.contains('open');
+        cards.classList.toggle('open');
+        toggle.classList.toggle('active');
+        toggle.setAttribute('aria-expanded', String(!isOpen));
+        block?.classList.toggle('revealed');
+    });
+
+    // Ripple effect
+    toggle.addEventListener('mousemove', (e) => {
+        const rect = toggle.getBoundingClientRect();
+        toggle.style.setProperty('--x', ((e.clientX - rect.left) / rect.width * 100) + '%');
+        toggle.style.setProperty('--y', ((e.clientY - rect.top) / rect.height * 100) + '%');
+    });
+})();
+
+
+// ──────────────────────────────────────────────────────────────
+// 8. JIKAN API — Anime Info Modal
+// ──────────────────────────────────────────────────────────────
+(function initAnimeModal() {
+    const MAL_ID   = 52991;
+    const JIKAN_URL = `https://api.jikan.moe/v4/anime/${MAL_ID}/full`;
+
+    const btnOpen   = document.getElementById('btnInfoDetail');
+    const modal     = document.getElementById('animeInfoModal');
+    const btnClose  = document.getElementById('closeAnimeModal');
+    const loadingEl = document.getElementById('animeLoading');
+    const contentEl = document.getElementById('animeModalContent');
+    const errorEl   = document.getElementById('animeError');
+    const retryBtn  = document.getElementById('animeRetry');
+
+    if (!modal) return;
+
+    let cache = null;
+
+    async function fetchData() {
+        if (cache) { render(cache); return; }
+
+        loadingEl.style.display = 'flex';
+        contentEl.style.display = 'none';
+        errorEl.style.display   = 'none';
+
+        try {
+            const res  = await fetch(JIKAN_URL);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const json = await res.json();
+            cache      = json.data;
+            render(cache);
+        } catch (err) {
+            console.error('[Jikan]', err);
+            loadingEl.style.display = 'none';
+            errorEl.style.display   = 'block';
+        }
+    }
+
+    function render(data) {
+        document.getElementById('animeModalImg').src = data.images?.jpg?.large_image_url || '';
+
+        document.getElementById('animeBadges').innerHTML = `
+            <span class="badge-status badge-tag">${data.status || 'N/A'}</span>
+            <span class="badge-type badge-tag">${data.type || 'N/A'}</span>
+            <span class="badge-year badge-tag">${data.year || data.aired?.prop?.from?.year || 'N/A'}</span>
+        `;
+
+        document.getElementById('animeModalTitle').textContent   = data.title_japanese || data.title;
+        document.getElementById('animeModalTitleEn').textContent = data.title_english  || data.title;
+
+        document.getElementById('animeStats').innerHTML = `
+            <div class="anime-stat"><span class="anime-stat-label">⭐ Score</span><span class="anime-stat-value">${data.score ?? 'N/A'}</span></div>
+            <div class="anime-stat"><span class="anime-stat-label">📺 Episode</span><span class="anime-stat-value">${data.episodes ?? '?'}</span></div>
+            <div class="anime-stat"><span class="anime-stat-label">📊 Rank</span><span class="anime-stat-value">#${data.rank ?? 'N/A'}</span></div>
+            <div class="anime-stat"><span class="anime-stat-label">⏱ Durasi</span><span class="anime-stat-value">${data.duration?.replace(' per ep','') ?? 'N/A'}</span></div>
+            <div class="anime-stat"><span class="anime-stat-label">🔞 Rating</span><span class="anime-stat-value">${data.rating?.split(' -')[0] ?? 'N/A'}</span></div>
+        `;
+
+        const synopsis = (data.synopsis || 'Tidak ada sinopsis.').replace(/\[Written by MAL Rewrite\]/g, '').trim();
+        document.getElementById('animeModalSynopsis').textContent = synopsis;
+
+        const allTags = [...(data.genres||[]), ...(data.themes||[]), ...(data.demographics||[])];
+        document.getElementById('animeGenres').innerHTML = allTags.map(g => `<span class="genre-tag">${g.name}</span>`).join('');
+
+        document.getElementById('animeMALLink').href = data.url || `https://myanimelist.net/anime/${MAL_ID}`;
+
+        loadingEl.style.display = 'none';
+        contentEl.style.display = 'block';
+    }
+
+    function openModal() {
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        fetchData();
+    }
+
+    function closeModal() {
+        modal.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    btnOpen?.addEventListener('click', openModal);
+    btnClose?.addEventListener('click', closeModal);
+    retryBtn?.addEventListener('click', () => { cache = null; fetchData(); });
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+})();
+
+
+// ──────────────────────────────────────────────────────────────
+// 9. CHARACTER TABS — new premium character showcase
+// ──────────────────────────────────────────────────────────────
+(function initCharTabs() {
+    const tabs   = document.querySelectorAll('.char-tab');
+    const panels = document.querySelectorAll('.char-panel');
+    if (!tabs.length) return;
+
+    function activateTab(key) {
+        tabs.forEach(t  => t.classList.toggle('active', t.dataset.char === key));
+        panels.forEach(p => {
+            const active = p.dataset.panel === key;
+            p.classList.toggle('active', active);
+            if (active) {
+                // Slight delay to let CSS transition settle
+                setTimeout(() => animatePowerBars(p), 80);
+            }
+        });
+    }
+
+    tabs.forEach(tab => tab.addEventListener('click', () => activateTab(tab.dataset.char)));
+
+    // Animate bars on first active panel
+    const firstPanel = document.querySelector('.char-panel.active');
+    if (firstPanel) setTimeout(() => animatePowerBars(firstPanel), 300);
+})();
+
+function animatePowerBars(panel) {
+    if (!panel) return;
+    const fills = panel.querySelectorAll('.cpb-fill');
+    fills.forEach(f => f.classList.remove('animated'));
     requestAnimationFrame(() => {
-        setTimeout(() => {
-            panel.querySelectorAll('.cpb-fill').forEach((fill, i) => {
-                setTimeout(() => fill.classList.add('animated'), i * 80);
-            });
-        }, 50);
+        requestAnimationFrame(() => {
+            fills.forEach((f, i) => setTimeout(() => f.classList.add('animated'), i * 80));
+        });
     });
 }
 
-// ── TIMELINE SCROLL REVEAL ──
+
+// ──────────────────────────────────────────────────────────────
+// 10. TIMELINE SCROLL REVEAL
+// ──────────────────────────────────────────────────────────────
 (function initTimeline() {
     const items = document.querySelectorAll('.tl-item');
     if (!items.length) return;
 
     const obs = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                obs.unobserve(entry.target);
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('visible');
+                obs.unobserve(e.target);
             }
         });
     }, { threshold: 0.2, rootMargin: '0px 0px -60px 0px' });
@@ -482,139 +521,117 @@ function animateBars(panel) {
     items.forEach(item => obs.observe(item));
 })();
 
-// ============================================================
-// SPELL COLLECTION — FIXED VERSION
-// Ganti seluruh blok spell di script.js dengan ini
-// ============================================================
 
+// ──────────────────────────────────────────────────────────────
+// 11. SPELL COLLECTION
+// ──────────────────────────────────────────────────────────────
 (function initSpells() {
-    const cards       = document.querySelectorAll('.spell-card');
-    const filterBtns  = document.querySelectorAll('.sf-btn');
-    const unlockedEl  = document.getElementById('unlockedCount');
-    const totalEl     = document.getElementById('totalCount');
-    const fillEl      = document.getElementById('counterFill');
+    const cards      = document.querySelectorAll('.spell-card');
+    const filterBtns = document.querySelectorAll('.sf-btn');
+    const unlockedEl = document.getElementById('unlockedCount');
+    const totalEl    = document.getElementById('totalCount');
+    const fillEl     = document.getElementById('counterFill');
 
-    if (!cards.length) {
-        console.warn('[Spells] Tidak ada .spell-card ditemukan di DOM');
-        return;
-    }
+    if (!cards.length) { console.warn('[Spells] No .spell-card found'); return; }
 
-    console.log('[Spells] Ditemukan', cards.length, 'kartu mantra');
+    if (totalEl) totalEl.textContent = cards.length;
 
-    const total = cards.length;
-    if (totalEl) totalEl.textContent = total;
-
-    // ── Flip on click ──
+    // Flip on click
     cards.forEach(card => {
         card.addEventListener('click', () => {
             card.classList.toggle('unlocked');
-            card.dataset.unlocked = card.classList.contains('unlocked') ? 'true' : 'false';
-
-            if (card.classList.contains('unlocked')) {
-                spawnBurst(card);
-            }
+            if (card.classList.contains('unlocked')) spawnBurst(card);
             updateCounter();
         });
     });
 
     function updateCounter() {
-        const count = document.querySelectorAll('.spell-card.unlocked:not([style*="display: none"])').length;
-        if (unlockedEl) unlockedEl.textContent = document.querySelectorAll('.spell-card.unlocked').length;
-        const all = document.querySelectorAll('.spell-card').length;
-        if (fillEl) fillEl.style.width = (document.querySelectorAll('.spell-card.unlocked').length / all * 100) + '%';
+        const count = document.querySelectorAll('.spell-card.unlocked').length;
+        if (unlockedEl) unlockedEl.textContent = count;
+        if (fillEl)     fillEl.style.width = (count / cards.length * 100) + '%';
     }
 
-    // ── Filter — FIXED: hanya pakai display none/block, tidak ada class hidden ──
+    // Filter
     filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             filterBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-
             const filter = btn.dataset.filter;
             cards.forEach(card => {
-                const match = filter === 'all' || card.dataset.rarity === filter;
-                card.style.display = match ? '' : 'none';
+                card.style.display = (filter === 'all' || card.dataset.rarity === filter) ? '' : 'none';
             });
         });
     });
 
-    // ── Burst effect on unlock ──
+    // Burst particles on unlock
     function spawnBurst(card) {
         const rect  = card.getBoundingClientRect();
-        const cx    = rect.left + rect.width / 2;
+        const cx    = rect.left + rect.width  / 2;
         const cy    = rect.top  + rect.height / 2;
+        const back  = card.querySelector('.sc-back');
+        const color = (back?.style.getPropertyValue('--spell-color') || '#5eecff').trim();
 
-        // Ambil warna dari CSS variable
-        const backEl = card.querySelector('.sc-back');
-        const raw    = backEl ? backEl.style.getPropertyValue('--spell-color') : '';
-        const color  = raw.trim() || '#5eecff';
-
-        for (let i = 0; i < 12; i++) {
+        for (let i = 0; i < 14; i++) {
             const dot    = document.createElement('div');
-            const angle  = (i / 12) * Math.PI * 2;
-            const radius = 60 + Math.random() * 40;
+            const angle  = (i / 14) * Math.PI * 2;
+            const radius = 55 + Math.random() * 45;
             const dx     = Math.cos(angle) * radius;
             const dy     = Math.sin(angle) * radius;
 
-            dot.style.cssText = `
-                position:fixed;
-                left:${cx}px;top:${cy}px;
-                width:6px;height:6px;
-                border-radius:50%;
-                background:${color};
-                pointer-events:none;
-                z-index:9999;
-                transform:translate(-50%,-50%);
-                transition:transform 0.6s ease,opacity 0.6s ease;
-                box-shadow:0 0 8px ${color};
-            `;
+            Object.assign(dot.style, {
+                position      : 'fixed',
+                left          : cx + 'px',
+                top           : cy + 'px',
+                width         : '6px',
+                height        : '6px',
+                borderRadius  : '50%',
+                background    : color,
+                pointerEvents : 'none',
+                zIndex        : '9999',
+                transform     : 'translate(-50%,-50%)',
+                transition    : 'transform 0.65s ease, opacity 0.65s ease',
+                boxShadow     : `0 0 10px ${color}`,
+            });
             document.body.appendChild(dot);
 
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    dot.style.transform = `translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(0)`;
-                    dot.style.opacity   = '0';
-                });
-            });
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                dot.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0)`;
+                dot.style.opacity   = '0';
+            }));
+
             setTimeout(() => dot.remove(), 700);
         }
     }
 
-    // ── Scroll reveal — FIXED: pakai class bukan inline opacity ──
-    const spellObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('spell-visible');
-                spellObserver.unobserve(entry.target);
+    // Scroll reveal
+    const spellObs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('spell-visible');
+                spellObs.unobserve(e.target);
             }
         });
     }, { threshold: 0.08 });
 
     cards.forEach((card, i) => {
         card.style.transitionDelay = (i * 0.07) + 's';
-        spellObserver.observe(card);
+        spellObs.observe(card);
     });
 
+    console.log('[Spells] Initialized —', cards.length, 'cards');
 })();
 
-// ============================================================
-// ELECTRIC BORDER — Vanilla JS Port dari React component
-// Credit: @BalintFerenczy | codepen.io/BalintFerenczy/pen/KwdoyEN
-// Tambah di paling bawah script.js
-// ============================================================
 
 // ──────────────────────────────────────────────────────────────
-// CONFIG — ISI URL KARAKTER DI SINI
-// Kalau karakter belum punya halaman, isi '#' atau biarkan ''
+// 12. ELECTRIC BORDER on Identity Cards
 // ──────────────────────────────────────────────────────────────
 const CHAR_URLS = {
-    frieren : '#',          // ganti dengan URL halaman Frieren
-    himmel  : '#',          // ganti dengan URL halaman Himmel
-    fern    : '#',          // ganti dengan URL halaman Fern
-    ubel    : '#',          // ganti dengan URL halaman Ubel
+    frieren : '#',
+    himmel  : '#',
+    fern    : '#',
+    ubel    : '#',
 };
 
-// Warna electric per karakter (hex)
 const CHAR_ELECTRIC_COLORS = {
     frieren : '#5eecff',
     himmel  : '#fbbf24',
@@ -622,21 +639,18 @@ const CHAR_ELECTRIC_COLORS = {
     ubel    : '#f87171',
 };
 
-// ──────────────────────────────────────────────────────────────
-// ELECTRIC BORDER CLASS — konversi langsung dari React
-// ──────────────────────────────────────────────────────────────
 class ElectricBorder {
     constructor(element, options = {}) {
         this.el       = element;
-        this.color    = options.color      || '#5eecff';
-        this.speed    = options.speed      || 1;
-        this.chaos    = options.chaos      || 0.12;
-        this.radius   = options.radius     || 18;
-        this.raf      = null;
+        this.color    = options.color  || '#5eecff';
+        this.speed    = options.speed  || 1;
+        this.chaos    = options.chaos  || 0.12;
+        this.radius   = options.radius || 18;
         this.time     = 0;
         this.lastTime = 0;
+        this.raf      = null;
 
-        // Canvas config constants (sama persis dengan React versi)
+        // Constants
         this.octaves      = 10;
         this.lacunarity   = 1.6;
         this.gain         = 0.7;
@@ -649,10 +663,7 @@ class ElectricBorder {
         this._start();
     }
 
-    // Noise helpers — port langsung dari JS
-    _random(x) {
-        return ((Math.sin(x * 12.9898) * 43758.5453) % 1 + 1) % 1;
-    }
+    _random(x) { return ((Math.sin(x * 12.9898) * 43758.5453) % 1 + 1) % 1; }
 
     _noise2D(x, y) {
         const i  = Math.floor(x), j  = Math.floor(y);
@@ -669,7 +680,7 @@ class ElectricBorder {
     _octavedNoise(x, time, seed) {
         let y = 0, amp = this.chaos, freq = this.frequency;
         for (let i = 0; i < this.octaves; i++) {
-            const a = i === 0 ? amp * 0 : amp;   // baseFlatness=0
+            const a = i === 0 ? 0 : amp;
             y    += a * this._noise2D(freq * x + seed * 100, time * freq * 0.3);
             freq *= this.lacunarity;
             amp  *= this.gain;
@@ -706,58 +717,30 @@ class ElectricBorder {
     }
 
     _build() {
-        // Wrapper styling
-        this.el.style.position = 'relative';
+        this.el.style.position  = 'relative';
         this.el.style.isolation = 'isolate';
-        this.el.style.overflow = 'visible';
+        this.el.style.overflow  = 'visible';
 
-        // Canvas
         this.canvas = document.createElement('canvas');
         this.canvas.style.cssText = `
-            position:absolute;
-            top:50%; left:50%;
+            position:absolute; top:50%; left:50%;
             transform:translate(-50%,-50%);
-            pointer-events:none;
-            z-index:2;
-            display:block;
+            pointer-events:none; z-index:2; display:block;
         `;
         this.el.appendChild(this.canvas);
 
-        // Glow layers
         this.glowWrap = document.createElement('div');
-        this.glowWrap.style.cssText = `
-            position:absolute; inset:0;
-            border-radius:inherit;
-            pointer-events:none; z-index:0;
-        `;
+        this.glowWrap.style.cssText = `position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;`;
 
-        const glow1 = document.createElement('div');
-        glow1.style.cssText = `
-            position:absolute; inset:0; border-radius:inherit;
-            border:2px solid ${this.color}99;
-            filter:blur(1px);
-        `;
+        const g1 = document.createElement('div');
+        g1.style.cssText = `position:absolute;inset:0;border-radius:inherit;border:2px solid ${this.color}99;filter:blur(1px);`;
+        const g2 = document.createElement('div');
+        g2.style.cssText = `position:absolute;inset:0;border-radius:inherit;border:2px solid ${this.color};filter:blur(4px);`;
+        const bg = document.createElement('div');
+        bg.style.cssText = `position:absolute;inset:0;border-radius:inherit;z-index:-1;transform:scale(1.1);filter:blur(32px);opacity:0.25;background:linear-gradient(-30deg,${this.color},transparent,${this.color}88);`;
 
-        const glow2 = document.createElement('div');
-        glow2.style.cssText = `
-            position:absolute; inset:0; border-radius:inherit;
-            border:2px solid ${this.color};
-            filter:blur(4px);
-        `;
-
-        const bgGlow = document.createElement('div');
-        bgGlow.style.cssText = `
-            position:absolute; inset:0; border-radius:inherit;
-            z-index:-1;
-            transform:scale(1.1);
-            filter:blur(32px);
-            opacity:0.25;
-            background:linear-gradient(-30deg, ${this.color}, transparent, ${this.color}88);
-        `;
-
-        this.glowWrap.append(glow1, glow2, bgGlow);
+        this.glowWrap.append(g1, g2, bg);
         this.el.appendChild(this.glowWrap);
-
         this.ctx = this.canvas.getContext('2d');
         this._resize();
     }
@@ -765,10 +748,9 @@ class ElectricBorder {
     _resize() {
         const rect = this.el.getBoundingClientRect();
         const dpr  = Math.min(window.devicePixelRatio || 1, 2);
-        const boff = this.borderOffset;
-        const w    = rect.width  + boff * 2;
-        const h    = rect.height + boff * 2;
-
+        const bo   = this.borderOffset;
+        const w    = rect.width  + bo * 2;
+        const h    = rect.height + bo * 2;
         this.canvas.width  = w * dpr;
         this.canvas.height = h * dpr;
         this.canvas.style.width  = w + 'px';
@@ -789,8 +771,8 @@ class ElectricBorder {
 
         const ctx  = this.ctx;
         const dpr  = Math.min(window.devicePixelRatio || 1, 2);
-        const boff = this.borderOffset;
-        const w    = this._w, h = this._h;
+        const bo   = this.borderOffset;
+        const w = this._w, h = this._h;
 
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -801,23 +783,22 @@ class ElectricBorder {
         ctx.lineCap     = 'round';
         ctx.lineJoin    = 'round';
 
-        const left  = boff, top = boff;
-        const bw    = w - 2*boff, bh = h - 2*boff;
-        const maxR  = Math.min(bw, bh) / 2;
-        const r     = Math.min(this.radius, maxR);
+        const left = bo, top = bo;
+        const bw   = w - 2*bo, bh = h - 2*bo;
+        const maxR = Math.min(bw, bh) / 2;
+        const r    = Math.min(this.radius, maxR);
         const perim = 2*(bw+bh) + 2*Math.PI*r;
         const count = Math.floor(perim / 2);
         const scale = this.displacement;
 
         ctx.beginPath();
         for (let i = 0; i <= count; i++) {
-            const progress = i / count;
-            const pt = this._rectPoint(progress, left, top, bw, bh, r);
-            const xN = this._octavedNoise(progress * 8, this.time, 0);
-            const yN = this._octavedNoise(progress * 8, this.time, 1);
-            const x  = pt.x + xN * scale;
-            const y  = pt.y + yN * scale;
-            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            const prog = i / count;
+            const pt   = this._rectPoint(prog, left, top, bw, bh, r);
+            const xN   = this._octavedNoise(prog * 8, this.time, 0);
+            const yN   = this._octavedNoise(prog * 8, this.time, 1);
+            i === 0 ? ctx.moveTo(pt.x + xN*scale, pt.y + yN*scale)
+                    : ctx.lineTo(pt.x + xN*scale, pt.y + yN*scale);
         }
         ctx.closePath();
         ctx.stroke();
@@ -826,10 +807,7 @@ class ElectricBorder {
     }
 
     _start() {
-        this.raf = requestAnimationFrame(t => {
-            this.lastTime = t;
-            this._draw(t);
-        });
+        this.raf = requestAnimationFrame(t => { this.lastTime = t; this._draw(t); });
     }
 
     destroy() {
@@ -839,82 +817,47 @@ class ElectricBorder {
         this.glowWrap.remove();
     }
 
-    // Update color at runtime
     setColor(c) {
         this.color = c;
-        // Update glow divs
         const divs = this.glowWrap.children;
-        if (divs[0]) divs[0].style.border = `2px solid ${c}99`;
-        if (divs[1]) divs[1].style.border = `2px solid ${c}`;
-        if (divs[2]) divs[2].style.background = `linear-gradient(-30deg, ${c}, transparent, ${c}88)`;
+        if (divs[0]) divs[0].style.border     = `2px solid ${c}99`;
+        if (divs[1]) divs[1].style.border     = `2px solid ${c}`;
+        if (divs[2]) divs[2].style.background = `linear-gradient(-30deg,${c},transparent,${c}88)`;
     }
 }
 
-// ──────────────────────────────────────────────────────────────
-// TERAPKAN KE IDENTITY CARDS
-// ──────────────────────────────────────────────────────────────
-(function applyElectricToIdentityCards() {
+(function applyElectricBorders() {
     const cards = document.querySelectorAll('.identity-card');
-    if (!cards.length) {
-        console.warn('[Electric] .identity-card tidak ditemukan');
-        return;
-    }
+    if (!cards.length) return;
 
     cards.forEach(card => {
         const charKey = card.dataset.char?.toLowerCase();
         const color   = CHAR_ELECTRIC_COLORS[charKey] || '#5eecff';
-
-        // 1. Pasang Electric Border — hanya aktif saat hover
         let eb = null;
 
-        card.addEventListener('mouseenter', () => {
-            if (!eb) {
-                eb = new ElectricBorder(card, {
-                    color  : color,
-                    speed  : 0.8,
-                    chaos  : 0.14,
-                    radius : 18,
-                });
-            }
-        });
-
-        // Lazy: buat electric saat halaman sudah siap (bukan hanya hover)
-        // agar efeknya sudah ada saat pertama kali visible
+        // Lazy init via IntersectionObserver
         const io = new IntersectionObserver((entries) => {
             entries.forEach(e => {
                 if (e.isIntersecting && !eb) {
-                    eb = new ElectricBorder(card, {
-                        color  : color,
-                        speed  : 0.6,
-                        chaos  : 0.12,
-                        radius : 18,
-                    });
+                    eb = new ElectricBorder(card, { color, speed: 0.6, chaos: 0.12, radius: 18 });
                     io.unobserve(card);
                 }
             });
         }, { threshold: 0.2 });
         io.observe(card);
 
-        // 2. Buat nama karakter jadi link yang bisa diklik
+        // Name as link
         const nameEl = card.querySelector('.icard-name');
         if (nameEl && charKey && CHAR_URLS[charKey] !== undefined) {
-            const originalText = nameEl.textContent;
+            const txt = nameEl.textContent;
             const url = CHAR_URLS[charKey];
-
-            // Ganti isi jadi <a> — styling diatur CSS
             nameEl.innerHTML = `
-                <a href="${url || '#'}"
-                   class="icard-name-link"
+                <a href="${url || '#'}" class="icard-name-link"
                    target="${url && url !== '#' ? '_blank' : '_self'}"
-                   rel="noopener noreferrer"
-                   data-char="${charKey}"
-                   title="Halaman ${originalText}">
-                    ${originalText}
-                    <span class="icard-name-arrow">↗</span>
-                </a>
-            `;
-
-            // Prevent card click buka modal saat klik nama
+                   rel="noopener noreferrer" data-char="${charKey}"
+                   title="Halaman ${txt}">
+                    ${txt}<span class="icard-name-arrow">↗</span>
+                </a>`;
             nameEl.querySelector('a')?.addEventListener('click', e => {
                 e.stopPropagation();
                 if (!url || url === '#') e.preventDefault();
@@ -925,141 +868,103 @@ class ElectricBorder {
     console.log('[Electric] Applied to', cards.length, 'identity cards');
 })();
 
-// ──────────────────────────────────────────────────────────────
-// HELPER — lo bisa panggil ini dari console untuk update URL
-// contoh: setCharUrl('frieren', 'https://example.com/frieren')
-// ──────────────────────────────────────────────────────────────
-function setCharUrl(charKey, url) {
-    CHAR_URLS[charKey] = url;
-    const link = document.querySelector(`.icard-name-link[data-char="${charKey}"]`);
-    if (link) {
-        link.href   = url;
-        link.target = url && url !== '#' ? '_blank' : '_self';
-        console.log(`[Electric] URL ${charKey} diupdate: ${url}`);
-    }
+// Helper — callable from console
+function setCharUrl(key, url) {
+    CHAR_URLS[key] = url;
+    const link = document.querySelector(`.icard-name-link[data-char="${key}"]`);
+    if (link) { link.href = url; link.target = url && url !== '#' ? '_blank' : '_self'; }
 }
 
-// ============================================================
-// TYPING QUOTE SECTION — Engine lengkap
-// Tambah di paling bawah script.js
-// ============================================================
 
 // ──────────────────────────────────────────────────────────────
-// DATA QUOTES — 7 kutipan paling emosional dari Frieren
+// 13. TYPING QUOTE SECTION
 // ──────────────────────────────────────────────────────────────
 const QUOTES = [
     {
-        char    : 'frieren',
-        name    : 'Frieren',
-        role    : 'Penyihir Elf · Kelompok Pahlawan',
-        img     : 'images/character-frieren.png',
-        color   : '#5eecff',
-        text    : 'Aku baru menyadari... aku tidak pernah benar-benar mengenalnya. Dan sekarang sudah terlambat untuk itu.',
-        context : 'Episode 1 · Pemakaman Himmel',
-        reflect : 'Satu kalimat yang menggambarkan seluruh inti cerita Frieren — tentang waktu yang berlalu dan penyesalan yang datang terlambat. Bagi elf yang sudah ribuan tahun hidup, sepuluh tahun bersama terasa seperti sekejap. Tapi kematian Himmel membuktikan: panjangnya waktu tidak ada artinya kalau tidak pernah diisi dengan sungguh-sungguh.',
+        char: 'frieren', name: 'Frieren', role: 'Penyihir Elf · Kelompok Pahlawan',
+        img: 'images/character-frieren.png', color: '#5eecff',
+        text: 'Aku baru menyadari... aku tidak pernah benar-benar mengenalnya. Dan sekarang sudah terlambat untuk itu.',
+        context: 'Episode 1 · Pemakaman Himmel',
+        reflect: 'Satu kalimat yang menggambarkan seluruh inti cerita Frieren — tentang waktu yang berlalu dan penyesalan yang datang terlambat. Bagi elf yang sudah ribuan tahun hidup, sepuluh tahun bersama terasa seperti sekejap. Tapi kematian Himmel membuktikan: panjangnya waktu tidak ada artinya kalau tidak pernah diisi dengan sungguh-sungguh.',
     },
     {
-        char    : 'himmel',
-        name    : 'Himmel',
-        role    : 'Pahlawan · Pemimpin Kelompok',
-        img     : 'images/character-himmel.png',
-        color   : '#fbbf24',
-        text    : 'Apakah perlu alasan untuk menolong seseorang? Aku hanya melakukan apa yang memang harus dilakukan.',
-        context : 'Sepanjang perjalanan · Filosofi Himmel',
-        reflect : 'Himmel tidak pernah menolong karena ingin dikenang. Ia menolong karena menurutnya itu yang benar. Patungnya ada di seluruh dunia bukan karena ia minta, melainkan karena orang-orang yang ia selamatkan tidak punya cara lain untuk berterima kasih.',
+        char: 'himmel', name: 'Himmel', role: 'Pahlawan · Pemimpin Kelompok',
+        img: 'images/character-himmel.png', color: '#fbbf24',
+        text: 'Apakah perlu alasan untuk menolong seseorang? Aku hanya melakukan apa yang memang harus dilakukan.',
+        context: 'Sepanjang perjalanan · Filosofi Himmel',
+        reflect: 'Himmel tidak pernah menolong karena ingin dikenang. Ia menolong karena menurutnya itu yang benar. Patungnya ada di seluruh dunia bukan karena ia minta, melainkan karena orang-orang yang ia selamatkan tidak punya cara lain untuk berterima kasih.',
     },
     {
-        char    : 'frieren',
-        name    : 'Frieren',
-        role    : 'Penyihir Elf · Kelompok Pahlawan',
-        img     : 'images/character-frieren.png',
-        color   : '#5eecff',
-        text    : 'Manusia memang makhluk yang aneh. Hanya hidup sebentar, tapi bisa meninggalkan kenangan yang bertahan berabad-abad.',
-        context : 'Sepanjang seri · Refleksi Frieren',
-        reflect : 'Di sinilah ironi terbesar Frieren — ia yang abadi justru belajar tentang makna hidup dari mereka yang hidupnya paling singkat. Himmel, Heiter, Eisen... mereka sudah tiada, tapi jejak mereka masih membawa Frieren berjalan.',
+        char: 'frieren', name: 'Frieren', role: 'Penyihir Elf · Kelompok Pahlawan',
+        img: 'images/character-frieren.png', color: '#5eecff',
+        text: 'Manusia memang makhluk yang aneh. Hanya hidup sebentar, tapi bisa meninggalkan kenangan yang bertahan berabad-abad.',
+        context: 'Sepanjang seri · Refleksi Frieren',
+        reflect: 'Di sinilah ironi terbesar Frieren — ia yang abadi justru belajar tentang makna hidup dari mereka yang hidupnya paling singkat. Himmel, Heiter, Eisen... mereka sudah tiada, tapi jejak mereka masih membawa Frieren berjalan.',
     },
     {
-        char    : 'heiter',
-        name    : 'Heiter',
-        role    : 'Pendeta Agung · Kelompok Pahlawan',
-        img     : 'images/character-heiter.png',
-        color   : '#facc15',
-        text    : 'Frieren... tolong jaga Fern. Itu satu-satunya permintaanku.',
-        context : 'Pertemuan terakhir · Permintaan Heiter',
-        reflect : 'Kata-kata terakhir dari seseorang yang tahu dirinya tidak punya banyak waktu lagi. Heiter tidak meminta banyak — hanya satu hal. Dan Frieren menerimanya tanpa ragu, tanpa kata-kata berlebihan. Itulah cara mereka menghormati satu sama lain.',
+        char: 'heiter', name: 'Heiter', role: 'Pendeta Agung · Kelompok Pahlawan',
+        img: 'images/character-heiter.png', color: '#facc15',
+        text: 'Frieren... tolong jaga Fern. Itu satu-satunya permintaanku.',
+        context: 'Pertemuan terakhir · Permintaan Heiter',
+        reflect: 'Kata-kata terakhir dari seseorang yang tahu dirinya tidak punya banyak waktu lagi. Heiter tidak meminta banyak — hanya satu hal. Dan Frieren menerimanya tanpa ragu, tanpa kata-kata berlebihan. Itulah cara mereka menghormati satu sama lain.',
     },
     {
-        char    : 'fern',
-        name    : 'Fern',
-        role    : 'Penyihir · Murid Frieren',
-        img     : 'images/character-fern.png',
-        color   : '#a78bfa',
-        text    : 'Guru tidak pernah bertanya apakah aku baik-baik saja. Tapi saat aku benar-benar membutuhkan, ia selalu ada.',
-        context : 'Refleksi Fern · Tentang Frieren',
-        reflect : 'Hubungan Frieren dan Fern tidak dibangun dengan kata-kata hangat atau perhatian yang ditunjukkan secara eksplisit. Ia dibangun lewat kehadiran yang konsisten — dan bagi Fern yang kehilangan segalanya, kehadiran itu lebih dari cukup.',
+        char: 'fern', name: 'Fern', role: 'Penyihir · Murid Frieren',
+        img: 'images/character-fern.png', color: '#a78bfa',
+        text: 'Guru tidak pernah bertanya apakah aku baik-baik saja. Tapi saat aku benar-benar membutuhkan, ia selalu ada.',
+        context: 'Refleksi Fern · Tentang Frieren',
+        reflect: 'Hubungan Frieren dan Fern tidak dibangun dengan kata-kata hangat atau perhatian yang ditunjukkan secara eksplisit. Ia dibangun lewat kehadiran yang konsisten — dan bagi Fern yang kehilangan segalanya, kehadiran itu lebih dari cukup.',
     },
     {
-        char    : 'stark',
-        name    : 'Stark',
-        role    : 'Pejuang · Murid Eisen',
-        img     : 'images/character-stark.png',
-        color   : '#f97316',
-        text    : 'Aku bukan pemberani. Aku hanya tidak bisa berdiam diri saat orang yang penting bagiku dalam bahaya.',
-        context : 'Mid-series · Pengakuan Stark',
-        reflect : 'Stark selalu menganggap dirinya penakut. Tapi tubuhnya bergerak duluan setiap kali seseorang yang ia cintai terancam. Mungkin itu definisi keberanian yang sebenarnya — bukan tanpa rasa takut, tapi bertindak meski takut.',
+        char: 'stark', name: 'Stark', role: 'Pejuang · Murid Eisen',
+        img: 'images/character-stark.png', color: '#f97316',
+        text: 'Aku bukan pemberani. Aku hanya tidak bisa berdiam diri saat orang yang penting bagiku dalam bahaya.',
+        context: 'Mid-series · Pengakuan Stark',
+        reflect: 'Stark selalu menganggap dirinya penakut. Tapi tubuhnya bergerak duluan setiap kali seseorang yang ia cintai terancam. Mungkin itu definisi keberanian yang sebenarnya — bukan tanpa rasa takut, tapi bertindak meski takut.',
     },
     {
-        char    : 'serie',
-        name    : 'Serie',
-        role    : 'Penyihir Terkuat · Guru Frieren',
-        img     : 'images/character-serie.png',
-        color   : '#ec4899',
-        text    : 'Sihir bukanlah tentang kekuatan. Ia tentang seberapa dalam kamu memahami dunia di sekitarmu.',
-        context : 'Filosofi Sihir · Dunia Frieren',
-        reflect : 'Serie, penyihir tertua yang masih hidup, memandang sihir bukan sebagai senjata melainkan sebagai pemahaman. Frieren yang telah hidup ribuan tahun pun masih terus belajar — dan itulah yang membuatnya berbeda dari penyihir biasa.',
+        char: 'serie', name: 'Serie', role: 'Penyihir Terkuat · Guru Frieren',
+        img: 'images/character-serie.png', color: '#ec4899',
+        text: 'Sihir bukanlah tentang kekuatan. Ia tentang seberapa dalam kamu memahami dunia di sekitarmu.',
+        context: 'Filosofi Sihir · Dunia Frieren',
+        reflect: 'Serie, penyihir tertua yang masih hidup, memandang sihir bukan sebagai senjata melainkan sebagai pemahaman. Frieren yang telah hidup ribuan tahun pun masih terus belajar — dan itulah yang membuatnya berbeda dari penyihir biasa.',
     },
 ];
 
-// ──────────────────────────────────────────────────────────────
-// PARTICLE ENGINE — floating ambient dots
-// ──────────────────────────────────────────────────────────────
+// Quote particles
 function initQuoteParticles() {
     const canvas = document.getElementById('quoteParticles');
     if (!canvas) return;
-    const ctx  = canvas.getContext('2d');
-    let W, H, particles = [], raf;
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [];
 
     function resize() {
         const section = canvas.closest('.quote-section');
         if (!section) return;
-        const rect = section.getBoundingClientRect();
-        W = canvas.width  = rect.width;
-        H = canvas.height = rect.height;
+        const r = section.getBoundingClientRect();
+        W = canvas.width  = r.width;
+        H = canvas.height = r.height;
     }
+
+    new ResizeObserver(resize).observe(canvas.closest('.quote-section') || document.body);
+    resize();
 
     function spawn() {
         return {
-            x    : Math.random() * W,
-            y    : H + 20,
-            r    : 0.8 + Math.random() * 1.8,
-            vx   : (Math.random() - 0.5) * 0.4,
-            vy   : -(0.3 + Math.random() * 0.6),
-            life : 0,
-            maxL : 200 + Math.random() * 200,
-            hue  : Math.random() > 0.6 ? 195 : (Math.random() > 0.5 ? 270 : 195),
+            x: Math.random() * W, y: H + 20,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: -(0.3 + Math.random() * 0.6),
+            r: 0.8 + Math.random() * 1.8,
+            life: 0, maxL: 200 + Math.random() * 200,
+            hue: Math.random() > 0.6 ? 195 : (Math.random() > 0.5 ? 270 : 195),
         };
     }
 
-    function loop() {
+    (function loop() {
         ctx.clearRect(0, 0, W, H);
-
-        // Spawn
         if (particles.length < 55 && Math.random() < 0.35) particles.push(spawn());
-
         particles = particles.filter(p => {
-            p.x   += p.vx;
-            p.y   += p.vy;
-            p.life++;
+            p.x += p.vx; p.y += p.vy; p.life++;
             const alpha = Math.sin((p.life / p.maxL) * Math.PI) * 0.45;
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
@@ -1067,50 +972,40 @@ function initQuoteParticles() {
             ctx.fill();
             return p.life < p.maxL && p.y > -20;
         });
-
-        raf = requestAnimationFrame(loop);
-    }
-
-    const resizeObs = new ResizeObserver(resize);
-    resizeObs.observe(canvas.closest('.quote-section') || document.body);
-    resize();
-    loop();
+        requestAnimationFrame(loop);
+    })();
 }
 
-// ──────────────────────────────────────────────────────────────
-// TYPING ENGINE
-// ──────────────────────────────────────────────────────────────
+// Typing engine
 (function initQuoteTyping() {
-    const stage       = document.getElementById('quoteStage');
-    const typedEl     = document.getElementById('qtTyped');
-    const cursorEl    = document.getElementById('qtCursor');
-    const reflectEl   = document.getElementById('quoteReflection');
-    const charImgEl   = document.getElementById('quoteCharImg');
-    const fallbackEl  = document.getElementById('qcaFallback');
-    const charNameEl  = document.getElementById('quoteCharName');
-    const charRoleEl  = document.getElementById('quoteCharRole');
-    const contextEl   = document.getElementById('quoteContext');
-    const dotsEl      = document.getElementById('quoteDots');
-    const prevBtn     = document.getElementById('quotePrev');
-    const nextBtn     = document.getElementById('quoteNext');
-    const replayBtn   = document.getElementById('quoteReplay');
-    const currNumEl   = document.getElementById('quoteCurrentNum');
-    const totalNumEl  = document.getElementById('quoteTotalNum');
+    const stage     = document.getElementById('quoteStage');
+    const typedEl   = document.getElementById('qtTyped');
+    const cursorEl  = document.getElementById('qtCursor');
+    const reflectEl = document.getElementById('quoteReflection');
+    const charImgEl = document.getElementById('quoteCharImg');
+    const fallbackEl= document.getElementById('qcaFallback');
+    const charNameEl= document.getElementById('quoteCharName');
+    const charRoleEl= document.getElementById('quoteCharRole');
+    const contextEl = document.getElementById('quoteContext');
+    const dotsEl    = document.getElementById('quoteDots');
+    const prevBtn   = document.getElementById('quotePrev');
+    const nextBtn   = document.getElementById('quoteNext');
+    const replayBtn = document.getElementById('quoteReplay');
+    const currNumEl = document.getElementById('quoteCurrentNum');
+    const totalNumEl= document.getElementById('quoteTotalNum');
 
     if (!stage || !typedEl) return;
 
-    let currentIdx = 0;
+    let idx = 0;
     let typingTimer = null;
-    let isTyping    = false;
 
-    // Total display
     if (totalNumEl) totalNumEl.textContent = String(QUOTES.length).padStart(2, '0');
 
-    // ── Build dots ──
+    // Build dots
     if (dotsEl) {
         QUOTES.forEach((_, i) => {
             const d = document.createElement('button');
-            d.className   = 'qdot' + (i === 0 ? ' active' : '');
+            d.className = 'qdot' + (i === 0 ? ' active' : '');
             d.setAttribute('aria-label', `Quote ${i + 1}`);
             d.addEventListener('click', () => goTo(i));
             dotsEl.appendChild(d);
@@ -1118,154 +1013,548 @@ function initQuoteParticles() {
     }
 
     function updateDots() {
-        document.querySelectorAll('.qdot').forEach((d, i) => {
-            d.classList.toggle('active', i === currentIdx);
-        });
+        document.querySelectorAll('.qdot').forEach((d, i) => d.classList.toggle('active', i === idx));
+        if (prevBtn) prevBtn.disabled = idx === 0;
+        if (nextBtn) nextBtn.disabled = idx === QUOTES.length - 1;
     }
 
-    // ── Render a quote ──
-    function render(idx) {
-        const q = QUOTES[idx];
-        if (!q) return;
-
-        // Stop any ongoing typing
+    function render(q) {
         clearTimeout(typingTimer);
-        isTyping = false;
 
         // Glow class
-        const glowClasses = ['glow-frieren','glow-himmel','glow-fern','glow-heiter','glow-stark','glow-eisen','glow-serie'];
-        stage.classList.remove(...glowClasses);
+        const glows = ['glow-frieren','glow-himmel','glow-fern','glow-heiter','glow-stark','glow-eisen','glow-serie'];
+        stage.classList.remove(...glows);
         stage.classList.add('glow-' + q.char);
 
-        // Character info
-        if (charImgEl) {
-            charImgEl.src   = q.img;
-            charImgEl.style.display = '';
-        }
+        if (charImgEl) charImgEl.src = q.img;
         if (fallbackEl) fallbackEl.textContent = q.name.charAt(0);
         if (charNameEl) charNameEl.textContent = q.name;
         if (charRoleEl) charRoleEl.textContent = q.role;
         if (contextEl)  contextEl.textContent  = q.context;
         if (currNumEl)  currNumEl.textContent  = String(idx + 1).padStart(2, '0');
+        if (cursorEl)   cursorEl.style.color   = q.color;
+        if (reflectEl)  { reflectEl.textContent = q.reflect; reflectEl.classList.remove('visible'); }
+        if (typedEl)    typedEl.textContent = '';
 
-        // Update cursor color via DOM
-        if (cursorEl) {
-            cursorEl.style.color = q.color;
-        }
-
-        // Hide reflection
-        if (reflectEl) {
-            reflectEl.textContent = q.reflect;
-            reflectEl.classList.remove('visible');
-        }
-
-        // Reset typed text
-        if (typedEl) typedEl.textContent = '';
-
-        // Start typing
         typeText(q.text, 0, q);
-
-        // Update dots + buttons
         updateDots();
-        if (prevBtn) prevBtn.disabled = idx === 0;
-        if (nextBtn) nextBtn.disabled = idx === QUOTES.length - 1;
     }
 
     function typeText(text, i, q) {
         if (i > text.length) {
-            isTyping = false;
-            // Show cursor still then fade reflection in
-            setTimeout(() => {
-                if (reflectEl) reflectEl.classList.add('visible');
-            }, 600);
+            setTimeout(() => reflectEl?.classList.add('visible'), 600);
             return;
         }
-
-        isTyping = true;
         if (typedEl) typedEl.textContent = text.slice(0, i);
-
-        // Vary speed: slower at punctuation, faster in the middle
-        const ch  = text[i - 1] || '';
-        const pauseChars = [',', '.', '!', '?', '—', '...', '\n'];
-        let delay = 38 + Math.random() * 22;
-        if (pauseChars.some(p => ch === p)) delay = 220 + Math.random() * 180;
-        if (ch === '.' || ch === '?') delay = 350;
-
+        const ch = text[i - 1] || '';
+        let delay = 36 + Math.random() * 20;
+        if (ch === ',' || ch === '—') delay = 200;
+        if (ch === '.' || ch === '?' || ch === '!') delay = 380;
         typingTimer = setTimeout(() => typeText(text, i + 1, q), delay);
     }
 
-    // ── Navigation ──
-    function goTo(idx, animate = true) {
-        if (idx < 0 || idx >= QUOTES.length) return;
-
+    function goTo(newIdx, animate = true) {
+        if (newIdx < 0 || newIdx >= QUOTES.length) return;
         if (animate) {
-            stage.style.opacity   = '0';
-            stage.style.transform = 'translateY(12px)';
             stage.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+            stage.style.opacity    = '0';
+            stage.style.transform  = 'translateY(12px)';
             setTimeout(() => {
-                currentIdx = idx;
-                render(idx);
+                idx = newIdx;
+                render(QUOTES[idx]);
                 stage.style.opacity   = '1';
                 stage.style.transform = 'translateY(0)';
             }, 260);
         } else {
-            currentIdx = idx;
-            render(idx);
+            idx = newIdx;
+            render(QUOTES[idx]);
         }
     }
 
-    // Buttons
-    if (prevBtn) prevBtn.addEventListener('click', () => goTo(currentIdx - 1));
-    if (nextBtn) nextBtn.addEventListener('click', () => goTo(currentIdx + 1));
+    if (prevBtn)   prevBtn.addEventListener('click', () => goTo(idx - 1));
+    if (nextBtn)   nextBtn.addEventListener('click', () => goTo(idx + 1));
     if (replayBtn) replayBtn.addEventListener('click', () => {
         clearTimeout(typingTimer);
-        if (typedEl) typedEl.textContent = '';
-        if (reflectEl) reflectEl.classList.remove('visible');
-        typeText(QUOTES[currentIdx].text, 0, QUOTES[currentIdx]);
+        if (typedEl)    typedEl.textContent = '';
+        if (reflectEl)  reflectEl.classList.remove('visible');
+        typeText(QUOTES[idx].text, 0, QUOTES[idx]);
     });
 
-    // Keyboard navigation
-    document.addEventListener('keydown', e => {
-        const section = document.getElementById('quotes');
-        if (!section) return;
-        const rect = section.getBoundingClientRect();
-        if (rect.top > window.innerHeight || rect.bottom < 0) return;
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(currentIdx + 1);
-        if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goTo(currentIdx - 1);
-    });
-
-    // Auto-advance — hanya jika typing sudah selesai dan refleksi sudah muncul
+    // Auto-advance
     let autoTimer;
     function scheduleAuto() {
         clearTimeout(autoTimer);
         autoTimer = setTimeout(() => {
-            if (currentIdx < QUOTES.length - 1) {
-                goTo(currentIdx + 1);
-                scheduleAuto();
-            }
-        }, 12000); // 12 detik per quote
+            if (idx < QUOTES.length - 1) { goTo(idx + 1); scheduleAuto(); }
+        }, 12000);
     }
 
-    // Pause auto saat hover
     stage.addEventListener('mouseenter', () => clearTimeout(autoTimer));
     stage.addEventListener('mouseleave', scheduleAuto);
 
-    // IntersectionObserver — mulai saat section masuk viewport
-    const qObserver = new IntersectionObserver(entries => {
+    // Start when in viewport
+    const qObs = new IntersectionObserver((entries) => {
         entries.forEach(e => {
             if (e.isIntersecting) {
                 goTo(0, false);
                 scheduleAuto();
-                qObserver.unobserve(e.target);
+                qObs.unobserve(e.target);
             }
         });
     }, { threshold: 0.3 });
 
     const qSection = document.getElementById('quotes');
-    if (qSection) qObserver.observe(qSection);
+    if (qSection) qObs.observe(qSection);
 
-    // Init particles
+    // Keyboard nav (only when section is visible)
+    document.addEventListener('keydown', e => {
+        const sect = document.getElementById('quotes');
+        if (!sect) return;
+        const r = sect.getBoundingClientRect();
+        if (r.top > window.innerHeight || r.bottom < 0) return;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(idx + 1);
+        if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goTo(idx - 1);
+    });
+
     initQuoteParticles();
+    console.log('[Quote] Engine aktif —', QUOTES.length, 'quotes');
+})();
 
-    console.log('[Quote] Typing engine aktif —', QUOTES.length, 'quotes');
+
+// ──────────────────────────────────────────────────────────────
+// 14. KEYBOARD NAV — hero section arrow keys
+// ──────────────────────────────────────────────────────────────
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft')  document.getElementById('prevBtn')?.click();
+    if (e.key === 'ArrowRight') document.getElementById('nextBtn')?.click();
+});
+
+
+// ──────────────────────────────────────────────────────────────
+// 15. PAGE LOAD — fade in
+// ──────────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+    document.body.style.transition = 'opacity 0.6s ease';
+    document.body.style.opacity    = '1';
+});
+
+// Set opacity to 0 instantly before load
+document.body.style.opacity = '0';
+
+console.log('🌿 Frieren Website — Loaded');
+console.log('✨ All sections initialized');
+console.log('⌨  Arrow keys: navigate character slider');
+
+// ──────────────────────────────────────────────────────────────
+// 16. THREE.JS PROCEDURAL RELIC (Tongkat Sihir & Mana)
+// ──────────────────────────────────────────────────────────────
+(function initThreeJSRelic() {
+    const container = document.getElementById('threeCanvasContainer');
+    if (!container || typeof THREE === 'undefined') return;
+
+    // SCENE SETUP
+    const scene = new THREE.Scene();
+    
+    // CAMERA
+    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.z = 15;
+
+    // RENDERER
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    // GROUPS & OBJECTS
+    const group = new THREE.Group();
+    scene.add(group);
+
+    // 1. TONGKAT SIHIR (Staff)
+    const handleGeo = new THREE.CylinderGeometry(0.15, 0.1, 8, 16);
+    const handleMat = new THREE.MeshStandardMaterial({ 
+        color: 0xaa8844, 
+        roughness: 0.6,
+        metalness: 0.5 
+    });
+    const handle = new THREE.Mesh(handleGeo, handleMat);
+    handle.position.y = -2;
+    group.add(handle);
+
+    // Head Ornament
+    const ringGeo = new THREE.TorusGeometry(1.2, 0.15, 16, 50, Math.PI * 1.5);
+    const ringMat = new THREE.MeshStandardMaterial({ 
+        color: 0xffd700, 
+        roughness: 0.3,
+        metalness: 0.8
+    });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.position.y = 2.5;
+    ring.rotation.z = -Math.PI * 0.25;
+    group.add(ring);
+
+    // Gem / Kristal Pusat
+    const gemGeo = new THREE.OctahedronGeometry(0.6, 0);
+    const gemMat = new THREE.MeshPhysicalMaterial({
+        color: 0xff2244,
+        emissive: 0xaa0011,
+        emissiveIntensity: 0.5,
+        transparent: true,
+        opacity: 0.9,
+        roughness: 0.1,
+        metalness: 0.1
+    });
+    const gem = new THREE.Mesh(gemGeo, gemMat);
+    gem.position.y = 2.5;
+    group.add(gem);
+
+    // 2. ENERGI MANA (Floating Particles)
+    const particles = new THREE.Group();
+    scene.add(particles);
+
+    const particleGeo = new THREE.IcosahedronGeometry(0.15, 0);
+    const particleMat = new THREE.MeshBasicMaterial({ 
+        color: 0x5eecff, 
+        transparent: true,
+        opacity: 0.8
+    });
+
+    for(let i=0; i<15; i++) {
+        const mesh = new THREE.Mesh(particleGeo, particleMat);
+        mesh.userData = {
+            radius: 2 + Math.random() * 3,
+            speed: (Math.random() * 0.02) + 0.01,
+            angle: Math.random() * Math.PI * 2,
+            yOffset: (Math.random() - 0.5) * 6
+        };
+        particles.add(mesh);
+    }
+
+    // 3. PEDANG HIMMEL (Hero's Sword)
+    const swordGroup = new THREE.Group();
+    scene.add(swordGroup);
+
+    const bladeGeo = new THREE.CylinderGeometry(0.01, 0.35, 6, 4);
+    const bladeMat = new THREE.MeshStandardMaterial({
+        color: 0xcccccc,
+        metalness: 0.8,
+        roughness: 0.3
+    });
+    const blade = new THREE.Mesh(bladeGeo, bladeMat);
+    blade.position.y = 1.5;
+    blade.rotation.y = Math.PI / 4;
+    swordGroup.add(blade);
+
+    const guardGeo = new THREE.BoxGeometry(2.5, 0.3, 0.3);
+    const guardMat = new THREE.MeshStandardMaterial({
+        color: 0xeebbaa,
+        metalness: 0.8,
+        roughness: 0.4
+    });
+    const guard = new THREE.Mesh(guardGeo, guardMat);
+    guard.position.y = -1.5;
+    swordGroup.add(guard);
+
+    const gripGeo = new THREE.CylinderGeometry(0.12, 0.1, 1.5, 16);
+    const gripMat = new THREE.MeshStandardMaterial({
+        color: 0x1a2b4c,
+        roughness: 0.9
+    });
+    const grip = new THREE.Mesh(gripGeo, gripMat);
+    grip.position.y = -2.4;
+    swordGroup.add(grip);
+
+    const pommelGeo = new THREE.SphereGeometry(0.25, 16, 16);
+    const pommel = new THREE.Mesh(pommelGeo, guardMat);
+    pommel.position.y = -3.2;
+    swordGroup.add(pommel);
+
+    // Light specific to Sword
+    const swordLight = new THREE.PointLight(0xffeedd, 0.8, 10);
+    swordLight.position.set(0, 0, 2);
+    swordGroup.add(swordLight);
+
+    // Initial setup for slider
+    let currentRelic = 0; // 0: Staff, 1: Sword
+    let targetXStaff = 0;
+    let targetXSword = 30;
+    
+    group.position.x = 0;
+    particles.position.x = 0;
+    swordGroup.position.x = 30;
+
+    const relicData = [
+        { title: "Tongkat Sihir Frieren", desc: "Zoltraak & Partikel Mana | Geser kursor Anda" },
+        { title: "Pedang Pahlawan Himmel", desc: "Baja Murni & Harapan | Geser kursor Anda" }
+    ];
+
+    const btnPrev = document.getElementById('relicPrev');
+    const btnNext = document.getElementById('relicNext');
+    const titleEl = document.getElementById('relicTitle');
+    const descEl = document.getElementById('relicDesc');
+    const dots = document.querySelectorAll('.rd-dot');
+
+    function updateRelicUI() {
+        if(titleEl) titleEl.textContent = relicData[currentRelic].title;
+        if(descEl) descEl.textContent = relicData[currentRelic].desc;
+        dots.forEach((d, i) => d.classList.toggle('active', i === currentRelic));
+    }
+
+    function switchRelic(dir) {
+        if(dir === 1) { // Next
+            currentRelic = 1;
+            targetXStaff = -30;
+            targetXSword = 0;
+        } else { // Prev
+            currentRelic = 0;
+            targetXStaff = 0;
+            targetXSword = 30;
+        }
+        updateRelicUI();
+    }
+
+    if(btnNext) btnNext.addEventListener('click', () => switchRelic(1));
+    if(btnPrev) btnPrev.addEventListener('click', () => switchRelic(-1));
+
+    // LIGHTS
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(5, 5, 5);
+    scene.add(directionalLight);
+
+    const pointLight = new THREE.PointLight(0xff2244, 2, 10);
+    pointLight.position.set(0, 2.5, 0);
+    scene.add(pointLight);
+
+    // ANIMATION & INTERACTION
+    let mouseX = 0;
+    let mouseY = 0;
+    let targetX = 0;
+    let targetY = 0;
+    const windowHalfX = container.clientWidth / 2;
+    const windowHalfY = container.clientHeight / 2;
+
+    container.addEventListener('mousemove', (e) => {
+        const rect = container.getBoundingClientRect();
+        mouseX = (e.clientX - rect.left) - windowHalfX;
+        mouseY = (e.clientY - rect.top) - windowHalfY;
+    });
+
+    container.addEventListener('mouseleave', () => {
+        mouseX = 0; mouseY = 0;
+    });
+
+    let time = 0;
+
+    function animate() {
+        requestAnimationFrame(animate);
+        time += 0.01;
+
+        // Smooth mouse rotation
+        targetX = mouseX * 0.002;
+        targetY = mouseY * 0.002;
+        group.rotation.y += 0.05 * (targetX - group.rotation.y);
+        group.rotation.x += 0.05 * (targetY - group.rotation.x);
+
+        // Lerp Slider Transitions
+        group.position.x += (targetXStaff - group.position.x) * 0.05;
+        particles.position.x += (targetXStaff - particles.position.x) * 0.05;
+        swordGroup.position.x += (targetXSword - swordGroup.position.x) * 0.05;
+
+        // Animations - Staff
+        group.position.y = Math.sin(time * 2) * 0.3;
+        gem.rotation.y += 0.02;
+        gem.rotation.x += 0.01;
+
+        particles.children.forEach(p => {
+            p.userData.angle += p.userData.speed;
+            p.position.x = Math.cos(p.userData.angle) * p.userData.radius;
+            p.position.z = Math.sin(p.userData.angle) * p.userData.radius;
+            p.position.y = p.userData.yOffset + Math.sin(time + p.userData.angle) * 1.5;
+            p.rotation.x += 0.01;
+            p.rotation.y += 0.02;
+        });
+
+        // Animations - Sword
+        swordGroup.position.y = Math.sin(time * 2.5) * 0.2;
+        swordGroup.rotation.y += 0.05 * (targetX - swordGroup.rotation.y);
+        swordGroup.rotation.x += 0.05 * (targetY - swordGroup.rotation.x);
+
+        renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // RESIZE HANDLER
+    window.addEventListener('resize', () => {
+        if (!container) return;
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+})();
+
+// ──────────────────────────────────────────────────────────────
+// 17. FRIEREN MANA BURST AURA EFFECT (Efek Lepas Mana)
+// ──────────────────────────────────────────────────────────────
+(function initFrierenManaAura() {
+    const container = document.getElementById('heroLayerChar');
+    if (!container) return;
+    
+    // Inject Canvas behind Frieren Image
+    const canvas = document.createElement('canvas');
+    canvas.className = 'frieren-mana-canvas';
+    container.insertBefore(canvas, container.firstChild);
+
+    const ctx = canvas.getContext('2d');
+    let W, H;
+    const particles = [];
+
+    function resize() {
+        W = canvas.width  = container.offsetWidth;
+        H = canvas.height = container.offsetHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    Object.assign(canvas.style, {
+        position: 'absolute',
+        inset: '0',
+        width: '100%',
+        height: '100%',
+        zIndex: '1',
+        pointerEvents: 'none',
+        mixBlendMode: 'screen',
+        opacity: '0.9'
+    });
+    
+    const img = container.querySelector('img');
+    if (img) {
+        img.style.position = 'relative';
+        img.style.zIndex = '2';
+    }
+
+    class AuraParticle {
+        constructor() {
+            this.reset(true);
+        }
+        reset(randomY = false) {
+            this.x = W * 0.25 + Math.random() * (W * 0.7);
+            this.y = randomY ? Math.random() * H : H + 50;
+            this.vx = (Math.random() - 0.5) * 1.5;
+            this.vy = -(1.5 + Math.random() * 4);
+            this.radius = 1 + Math.random() * 5;
+            this.life = 0;
+            this.maxLife = 80 + Math.random() * 120;
+            this.hue = 180 + Math.random() * 50; 
+            this.alpha = 0;
+            this.sparkle = Math.random() > 0.8;
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            
+            this.vx += Math.sin(this.life * 0.04) * 0.08;
+            
+            this.life++;
+            let progress = this.life / this.maxLife;
+            
+            if (progress < 0.2) {
+                this.alpha = progress / 0.2;
+            } else if (progress > 0.8) {
+                this.alpha = (1 - progress) / 0.2;
+            } else {
+                this.alpha = 1;
+            }
+
+            if (this.sparkle && Math.random() > 0.8) {
+                this.alpha = Math.random();
+            }
+
+            if (this.life >= this.maxLife) this.reset();
+        }
+        draw(ctx) {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = `hsla(${this.hue}, 100%, 75%, ${this.alpha * 0.85})`;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = `hsl(${this.hue}, 100%, 75%)`;
+            ctx.fill();
+        }
+    }
+
+    for (let i = 0; i < 200; i++) {
+        particles.push(new AuraParticle());
+    }
+
+    let time = 0;
+
+    function drawManaFlame() {
+        ctx.save();
+        ctx.shadowBlur = 40;
+        ctx.shadowColor = '#5eecff';
+        ctx.lineCap = 'round';
+
+        for (let i = 0; i < 7; i++) {
+            ctx.beginPath();
+            ctx.lineWidth = 12 + Math.sin(time + i) * 6;
+            ctx.strokeStyle = `rgba(94, 236, 255, ${0.12 + Math.sin(time * 2 + i) * 0.08})`;
+            
+            const startX = W * 0.6 + (i - 3) * 60;
+            ctx.moveTo(startX, H + 20);
+            
+            for (let y = H + 20; y > H * 0.1; y -= 30) {
+                const xOffset = Math.sin(y * 0.005 - time * 5 + i) * (100 - i * 8);
+                ctx.lineTo(startX + xOffset, y);
+            }
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    function drawMagicRings() {
+        ctx.save();
+        ctx.translate(W * 0.7, H * 0.5);
+        ctx.rotate(-time * 0.3);
+
+        ctx.shadowBlur = 25;
+        ctx.shadowColor = '#a78bfa';
+        ctx.strokeStyle = `rgba(167, 139, 250, ${0.2 + Math.sin(time * 2) * 0.1})`;
+
+        for (let r = 0; r < 3; r++) {
+            ctx.beginPath();
+            ctx.lineWidth = 2 + r * 1.5;
+            const radius = 180 + r * 70 + Math.sin(time * 1.5 + r) * 15;
+            ctx.arc(0, 0, radius, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.lineWidth = 3;
+            ctx.setLineDash([20, 30]);
+            ctx.arc(0, 0, radius + 25, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+        ctx.restore();
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, W, H);
+        ctx.globalCompositeOperation = 'screen';
+        
+        drawMagicRings();
+        drawManaFlame();
+
+        particles.forEach(p => {
+            p.update();
+            p.draw(ctx);
+        });
+
+        time += 0.02;
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+    console.log('✨ Efek Mana Release (Aura Frieren) aktif');
 })();
