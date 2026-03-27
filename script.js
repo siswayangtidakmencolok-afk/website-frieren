@@ -1576,3 +1576,275 @@ console.log('⌨  Arrow keys: navigate character slider');
     animate();
     console.log('✨ Efek Mana Release (Aura Frieren) aktif');
 })();
+
+// ──────────────────────────────────────────────────────────────
+// 18. 3D GRIMOIRE BOOK LOGIC
+// ──────────────────────────────────────────────────────────────
+(function initGrimoireBook() {
+    const book = document.getElementById('grimoireBook');
+    const prevBtn = document.getElementById('bookPrev');
+    const nextBtn = document.getElementById('bookNext');
+    if (!book) return;
+
+    const pages = book.querySelectorAll('.book-page');
+    let currentPage = 0; // Mulai dari sampul depan
+
+    function updateBook() {
+        // Jika sedang di cover depan / belakang, jangan geser tengah
+        if (currentPage === 0 || currentPage === pages.length) {
+            book.classList.remove('open');
+        } else {
+            book.classList.add('open');
+        }
+
+        pages.forEach((page, index) => {
+            if (index < currentPage) {
+                // Halaman diputar ke kiri
+                page.classList.add('flipped');
+                // z-index kecil di kiri (karena stack terbalik)
+                page.style.zIndex = index;
+            } else {
+                // Halaman di sebelah kanan belum diputar
+                page.classList.remove('flipped');
+                // z-index besar di kanan (teratas)
+                page.style.zIndex = pages.length - index;
+            }
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < pages.length) {
+                currentPage++;
+                updateBook();
+            }
+        });
+    }
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 0) {
+                currentPage--;
+                updateBook();
+            }
+        });
+    }
+
+    // Klik area kosong pada kertas untuk membalik halaman
+    pages.forEach((page, index) => {
+        const front = page.querySelector('.page-front');
+        if (front) {
+            front.addEventListener('click', (e) => {
+                // Abaikan klik flip halaman jika yang diklik adalah spell-card (agar hanya kartu yg terbuka/terbalik)
+                if (e.target.closest('.spell-card')) return;
+                
+                if (currentPage === index) {
+                    currentPage++;
+                    updateBook();
+                }
+            });
+        }
+        
+        const back = page.querySelector('.page-back');
+        if (back) {
+            back.addEventListener('click', (e) => {
+                if (e.target.closest('.spell-card')) return;
+
+                if (currentPage === index + 1) {
+                    currentPage--;
+                    updateBook();
+                }
+            });
+        }
+    });
+
+    // Inisialisasi posisi awal 3D
+    updateBook();
+})();
+
+// ──────────────────────────────────────────────────────────────
+// 19. MAGNETIC BUTTON HOVER EFFECT
+// ──────────────────────────────────────────────────────────────
+(function initMagneticButtons() {
+    const magnets = document.querySelectorAll('.rn-btn, .spell-nav-btn, .btn-mal, .char-tab');
+    magnets.forEach(btn => {
+        btn.addEventListener('mousemove', (e) => {
+            const rect = btn.getBoundingClientRect();
+            const h = rect.width / 2;
+            const x = e.clientX - rect.left - h;
+            const y = e.clientY - rect.top - h;
+            btn.style.transform = `translate(${x * 0.25}px, ${y * 0.25}px)`;
+        });
+        btn.addEventListener('mouseleave', () => {
+            btn.style.transform = `translate(0px, 0px)`;
+            btn.style.transition = `transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)`;
+        });
+        btn.addEventListener('mouseenter', () => {
+            btn.style.transition = `none`;
+        });
+    });
+})();
+
+// ──────────────────────────────────────────────────────────────
+// 20. BINTANG JATUH & PARTIKEL SIHIR FRIEREN (Scroll Effect)
+// ──────────────────────────────────────────────────────────────
+(function initGlobalScrollMagic() {
+    const canvas = document.createElement('canvas');
+    Object.assign(canvas.style, {
+        position: 'fixed',
+        inset: '0',
+        width: '100vw',
+        height: '100vh',
+        pointerEvents: 'none',
+        zIndex: '9999',
+        mixBlendMode: 'screen',
+        opacity: '0.5' // Lower opacity for elegance and less visual noise
+    });
+    document.body.appendChild(canvas);
+    
+    const ctx = canvas.getContext('2d');
+    let W, H;
+    let particles = [];
+    let shootingStars = [];
+    let scrollY = window.scrollY;
+    let scrollSpeed = 0;
+
+    function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    window.addEventListener('scroll', () => {
+        const newScroll = window.scrollY;
+        scrollSpeed = newScroll - scrollY;
+        scrollY = newScroll;
+        
+        // Peluang muncul bintang jatuh sangat jarang & butuh scroll yang sangat kencang
+        if (Math.abs(scrollSpeed) > 40 && Math.random() > 0.95) {
+            spawnShootingStar();
+        }
+    });
+
+    function spawnShootingStar() {
+        if (shootingStars.length > 1) return; // Max 1-2 komet agar sangat spesial
+        const isUp = scrollSpeed > 0;
+        shootingStars.push({
+            x: Math.random() * W * 1.5 - W * 0.2, 
+            y: isUp ? -50 : H + 50,
+            vx: (Math.random() * 8 + 15) * (Math.random() > 0.5 ? 1 : -1), 
+            vy: isUp ? (Math.random() * 10 + 20) : -(Math.random() * 10 + 20),
+            life: 1,
+            maxLife: 40 + Math.random() * 20,
+            size: 0.8 + Math.random() * 1.2, // Lebih kecil & elegan
+            hue: 180 + Math.random() * 40
+        });
+    }
+
+    class MagicDust {
+        constructor() {
+            this.x = Math.random() * W;
+            this.y = Math.random() * H;
+            this.size = Math.random() * 1.5 + 0.5; // Partikel lebih kecil
+            this.vx = (Math.random() - 0.5) * 0.2;
+            this.vy = -Math.random() * 0.3 - 0.1;
+            this.hue = 180 + Math.random() * 50; 
+            this.baseAlpha = 0.1 + Math.random() * 0.3; // Lebih transparan
+        }
+        update() {
+            this.y -= scrollSpeed * (0.05 + this.size * 0.05);
+            this.x += this.vx - scrollSpeed * 0.01 * (this.x > W/2 ? 1 : -1); 
+            this.y += this.vy;
+
+            if (this.y < -100) this.y = H + 50;
+            if (this.y > H + 100) this.y = -50;
+            if (this.x < -50) this.x = W + 50;
+            if (this.x > W + 50) this.x = -50;
+        }
+        draw(ctx) {
+            const stretchY = Math.max(1, Math.abs(scrollSpeed * 0.1));
+            const stretchX = Math.abs(scrollSpeed * 0.02);
+
+            if (stretchY > 1.5) {
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                const endY = this.y + (scrollSpeed > 0 ? stretchY * 5 : -stretchY * 5);
+                const endX = this.x + (this.x > W/2 ? stretchX * 5 : -stretchX * 5);
+                ctx.lineTo(endX, endY);
+                ctx.strokeStyle = `hsla(${this.hue}, 100%, 75%, Math.min(0.5, stretchY/10))`;
+                ctx.lineWidth = this.size;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            } else {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.fillStyle = `hsla(${this.hue}, 100%, 75%, ${this.baseAlpha})`;
+                ctx.shadowBlur = 5;
+                ctx.shadowColor = `hsl(${this.hue}, 100%, 75%)`;
+                
+                ctx.beginPath();
+                ctx.moveTo(0, -this.size * 1.5);
+                ctx.lineTo(this.size, 0);
+                ctx.lineTo(0, this.size * 1.5);
+                ctx.lineTo(-this.size, 0);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+    }
+
+    // Hanya 12 partikel (sangat ringan, elegan, tidak norak)
+    for (let i = 0; i < 12; i++) {
+        particles.push(new MagicDust());
+    }
+
+    function animate() {
+        scrollSpeed *= 0.85; // Dampening lebih halus
+        
+        ctx.clearRect(0, 0, W, H);
+        
+        particles.forEach(p => {
+            p.update();
+            p.draw(ctx);
+        });
+
+        for (let i = shootingStars.length - 1; i >= 0; i--) {
+            let star = shootingStars[i];
+            
+            ctx.beginPath();
+            ctx.moveTo(star.x, star.y);
+            let tailLen = star.maxLife - star.life;
+            ctx.lineTo(star.x - star.vx * tailLen * 0.1, star.y - star.vy * tailLen * 0.1);
+            let grad = ctx.createLinearGradient(star.x, star.y, star.x - star.vx * tailLen * 0.1, star.y - star.vy * tailLen * 0.1);
+            grad.addColorStop(0, `hsla(${star.hue}, 100%, 85%, 0.8)`);
+            grad.addColorStop(1, `hsla(${star.hue}, 100%, 85%, 0)`);
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = star.size;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.size * 1.2, 0, Math.PI*2);
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = `hsl(${star.hue}, 100%, 80%)`;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            star.x += star.vx;
+            star.y += star.vy + (scrollSpeed * 0.2);
+            star.life++;
+
+            if (star.life >= star.maxLife || star.x < -100 || star.x > W+100 || star.y < -100 || star.y > H+100) {
+                shootingStars.splice(i, 1);
+            }
+        }
+
+        requestAnimationFrame(animate);
+    }
+    
+    animate();
+    console.log('✨ Particle Sihir & Bintang Jatuh Aktif (Elegan & Ringan)');
+})();

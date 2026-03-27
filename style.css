@@ -2309,11 +2309,7 @@ SPELL COLLECTION — FIXED CSS
 
 /* ── Filters ── */
 .spell-filters {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-    margin-top: 1.5rem;
+    display: none; /* Disembunyikan untuk mode 3D Book */
 }
 
 .sf-btn {
@@ -2348,96 +2344,212 @@ SPELL COLLECTION — FIXED CSS
     flex-shrink: 0;
 }
 
-/* ── Spell Slider Container ── */
-.spells-slider-wrap {
+/* ── GRIMOIRE 3D BOOK CONTAINER ── */
+.grimoire-wrapper {
     position: relative;
-    max-width: 100%;
-    margin-bottom: 2.5rem;
+    max-width: 900px;
+    margin: 0 auto 3rem;
     display: flex;
+    justify-content: center;
     align-items: center;
+    perspective: 1800px;
+    padding: 3rem 0;
+    height: 520px;
 }
 
 .spell-nav-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(94, 236, 255, 0.3);
-    color: #5eecff;
-    width: 44px;
-    height: 44px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid rgba(218, 165, 32, 0.5); /* Aksen Emas Kuningan */
+    color: #daa520;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     cursor: pointer;
     backdrop-filter: blur(5px);
-    z-index: 10;
+    z-index: 20;
     transition: all 0.3s ease;
-    display: flex; /* Always visible for easy nav */
+    display: flex;
     align-items: center;
     justify-content: center;
 }
-
 .spell-nav-btn:hover {
-    background: rgba(94, 236, 255, 0.2);
+    background: rgba(218, 165, 32, 0.2);
     transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 0 15px rgba(218,165,32,0.4);
 }
 
-.spell-prev { left: -20px; }
-.spell-next { right: -20px; }
-
-@media (max-width: 1024px) {
-    .spell-prev { left: -5px; }
-    .spell-next { right: -5px; }
+/* Base Buku */
+.grimoire-book {
+    position: relative;
+    width: 320px;
+    height: 460px;
+    transform-style: preserve-3d;
+    transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+    /* Kemiringan awal (tergeletak/menghadap diagonal) */
+    transform: rotateX(15deg) rotateY(20deg);
 }
 
-/* ── Spell Grid (Carousel) ── */
-.spells-grid {
-    display: flex;
-    gap: 1.5rem;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
-    padding: 1rem 0 2rem;
-    scroll-behavior: smooth;
+/* Saat buku di halaman isi, geser ke tengah layar biar seimbang Kiri-Kanan */
+.grimoire-book.open {
+    transform: rotateX(12deg) rotateY(0deg) translateX(160px); 
+}
+
+@media (max-width: 800px) {
+    .grimoire-book {
+        width: 300px;
+        height: 440px;
+    }
+    .grimoire-book.open {
+        transform: rotateX(10deg) rotateY(0deg) translateX(0) scale(0.9); /* Jangan digeser jika di HP */
+    }
+}
+
+/* Halaman-Halaman */
+.book-page {
+    position: absolute;
     width: 100%;
-}
-.spells-grid::-webkit-scrollbar {
-    display: none; /* Chrome/Safari */
-}
-
-/* ── Individual Card ── */
-.spell-card {
-    flex: 0 0 calc(33.333% - 1rem);
-    scroll-snap-align: center;
-    perspective: 1000px;
-    height: 380px;
+    height: 100%;
+    top: 0; left: 0;
+    transform-origin: left center;
+    transform-style: preserve-3d;
+    transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1);
     cursor: pointer;
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-/* Reveal class dari JS */
-.spell-card.spell-visible {
-    opacity: 1;
-    transform: translateY(0);
+.book-page.flipped {
+    transform: rotateY(-180deg);
 }
 
-@media (max-width: 900px) {
-    .spell-card { flex: 0 0 calc(50% - 0.75rem); }
+/* Muka & Belakang Selembar Kertas */
+.page-front, .page-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    /* Kertas Kuno Perkamen */
+    background-color: #e8dcc4;
+    background-image: repeating-linear-gradient(90deg, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 24px, rgba(139,69,19,0.05) 25px), radial-gradient(circle at center, rgba(0,0,0,0) 30%, rgba(139,69,19,0.2) 100%);
+    border: 1px solid #c2b280;
+    border-radius: 3px 12px 12px 3px;
+    box-shadow: inset 4px 0 10px rgba(0,0,0,0.15), inset -4px 0 10px rgba(255,255,255,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-@media (max-width: 600px) {
-    .spell-card { flex: 0 0 85%; }
+.page-back {
+    transform: rotateY(180deg);
+    border-radius: 12px 3px 3px 12px;
+    box-shadow: inset -4px 0 10px rgba(0,0,0,0.15), inset 4px 0 10px rgba(255,255,255,0.4);
+}
+
+/* Cover Kulit Luar */
+.cover-front, .cover-back {
+    background-color: #2b1f1a;
+    background-image: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.8) 100%), linear-gradient(45deg, #2b1f1a 25%, #3a2820 50%, #2b1f1a 75%);
+    border: 3px solid #8b6508;
+    border-radius: 4px 15px 15px 4px;
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 6px 6px 15px rgba(0,0,0,0.6);
+}
+
+.cover-back {
+    border-radius: 15px 4px 4px 15px;
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.8), -6px 6px 15px rgba(0,0,0,0.6);
+}
+
+/* Inner Text di Halaman */
+.page-content {
+    text-align: center;
+    color: #4a3b32;
+    padding: 30px 20px;
+    font-family: 'Times New Roman', serif;
+}
+.page-content h3 { 
+    font-size: 1.8rem; 
+    border-bottom: 2px solid #8b5a2b; 
+    padding-bottom: 10px; 
+    margin-bottom: 15px;
+    color: #3e2712;
+    font-style: italic;
+}
+.page-content p { 
+    font-size: 1.05rem; 
+    line-height: 1.8; 
+}
+
+/* Desain Emas di Cover Buku */
+.cover-design {
+    width: 86%;
+    height: 92%;
+    border: 2px double #daa520;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #daa520;
+    text-align: center;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.2);
+}
+
+.cover-design h2 { 
+    font-size: 1.3rem; 
+    font-family: 'Georgia', serif; 
+    margin-bottom: 0.5rem; 
+    letter-spacing: 4px; 
+    text-transform: uppercase;
+}
+.cover-design h1 { 
+    font-size: 3rem; 
+    font-family: 'Georgia', serif; 
+    margin-bottom: 2.5rem; 
+    text-shadow: 0 0 10px rgba(218,165,32,0.4);
+}
+.cover-seal {
+    width: 90px; height: 90px;
+    border: 2px dashed #daa520;
+    border-radius: 50%;
+    animation: sealSpin1 20s linear infinite;
+    position: relative;
+    box-shadow: 0 0 15px rgba(218,165,32,0.3);
+}
+.cover-seal::after {
+    content: 'Ф';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    font-family: serif;
+    animation: sealSpin2 10s linear infinite;
+}
+
+/* ── OVERRIDE SPELL CARD AGAR MASUK KE BUKU ── */
+.spell-card {
+    width: 85%;
+    height: 90%;
+    perspective: 1000px;
+    cursor: pointer;
+    /* Reset properti bawaan slider lama */
+    flex: none;
+    opacity: 1 !important;
+    transform: none !important;
 }
 
 .sc-inner {
     position: relative;
     width: 100%; height: 100%;
     transform-style: preserve-3d;
-    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-    border-radius: 18px;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 8px; /* Sedikit kotak biar seperti kartu tarot ajaib */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 .spell-card.unlocked .sc-inner {
@@ -2450,9 +2562,10 @@ SPELL COLLECTION — FIXED CSS
     inset: 0;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    border-radius: 18px;
-    background: linear-gradient(145deg, rgba(14,14,30,0.97), rgba(8,6,22,1));
-    border: 1px solid rgba(94,236,255,0.15);
+    border-radius: 8px;
+    /* Background sedikit tembus pandang atau gradasi kuno untuk menyatu tekstur kertas */
+    background: linear-gradient(145deg, rgba(20,15,25,0.92), rgba(10,8,20,0.95));
+    border: 1px solid rgba(94,236,255,0.2);
     display: flex;
     flex-direction: column;
     align-items: center;

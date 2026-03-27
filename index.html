@@ -112,10 +112,10 @@
             </div>
 
             <div class="hero-buttons">
-                <a href="https://www.bilibili.tv/en/play/2028342"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   class="btn-primary btn-watch">
+                <a href="https://www.justwatch.com/id/tv-show/frieren-beyond-journeys-end/season-1"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn-primary btn-watch">
                     <span>▶ Tonton Sekarang</span>
                 </a>
                 <button class="btn-secondary" id="btnInfoDetail">ℹ Informasi Detail</button>
@@ -189,279 +189,210 @@ Taruh SETELAH <section class="image-slider-section"> dan SEBELUM <section class=
             </div>
         </div>
 
-        <!-- SPELL GRID WRAPPER -->
-        <div class="spells-slider-wrap">
-            <button class="spell-nav-btn spell-prev" id="spellPrev">❮</button>
+        <!-- GRIMOIRE 3D BOOK WRAPPER -->
+        <div class="grimoire-wrapper">
+            <button class="spell-nav-btn spell-prev" id="bookPrev" style="left: 5px; z-index: 20;">❮</button>
             
-            <div class="spells-grid" id="spellsGrid">
+            <div class="grimoire-book" id="grimoireBook">
 
-            <!-- ── ZOLTRAAK ── -->
-            <div class="spell-card" data-rarity="combat" data-unlocked="false">
-                <div class="sc-inner">
-                    <!-- FRONT -->
-                    <div class="sc-front">
-                        <div class="sc-seal">
-                            <div class="sc-seal-ring r1"></div>
-                            <div class="sc-seal-ring r2"></div>
-                            <div class="sc-seal-core">ゾルトラーク</div>
+                <!-- ── COVER DEPAN (Page 0) ── -->
+                <div class="book-page">
+                    <div class="page-front cover-front">
+                        <div class="cover-design">
+                            <h2>Grimoire</h2>
+                            <h1>Flamme</h1>
+                            <div class="cover-seal"></div>
                         </div>
-                        <div class="sc-front-rarity combat">Tempur</div>
-                        <p class="sc-front-hint">Sentuh untuk membuka segel</p>
                     </div>
-                    <!-- BACK -->
-                    <div class="sc-back" style="--spell-color:#3b82f6; --spell-glow:rgba(59,130,246,0.3)">
-                        <div class="sc-back-particles"></div>
-                        <div class="sc-rarity-badge combat">⚔ Tempur</div>
-                        <div class="sc-symbol">◈</div>
-                        <h3 class="sc-name">Zoltraak</h3>
-                        <div class="sc-jp">ゾルトラーク</div>
-                        <p class="sc-effect">Sihir penghancur standar yang awalnya adalah sihir ofensif milik iblis. Frieren mempelajarinya secara menyeluruh hingga bisa dilepaskan tanpa mantra.</p>
-                        <div class="sc-tags">
-                            <span>Ofensif</span>
-                            <span>Anti-iblis</span>
-                            <span>Tanpa Mantra</span>
+                    <div class="page-back">
+                        <div class="page-content">
+                            <h3>Daftar Sihir</h3>
+                            <p>Buku ini memuat koleksi sihir yang dikumpulkan Frieren selama ribuan tahun perjalanan.</p>
+                            <p style="margin-top:30px; color:#8b5a2b; font-style:italic;">~ Klik sudut kanan halaman untuk membalik ~</p>
+                            <p style="font-size:0.8rem; margin-top:10px; color:#666;">Arahkan kursor atau sentuh kartu untuk membuka segel sihir.</p>
                         </div>
-                        <div class="sc-user">Pengguna: Frieren · Fern · Iblis</div>
                     </div>
                 </div>
-            </div>
 
-            <!-- ── BUNGA MEKAR ── -->
-            <div class="spell-card" data-rarity="useless" data-unlocked="false">
-                <div class="sc-inner">
-                    <div class="sc-front">
-                        <div class="sc-seal">
-                            <div class="sc-seal-ring r1"></div>
-                            <div class="sc-seal-ring r2"></div>
-                            <div class="sc-seal-core">花の魔法</div>
+                <!-- ── HALAMAN 1 ── -->
+                <div class="book-page">
+                    <!-- Front: Zoltraak -->
+                    <div class="page-front">
+                        <div class="spell-card" data-rarity="combat" data-unlocked="false">
+                            <div class="sc-inner">
+                                <div class="sc-front">
+                                    <div class="sc-seal">
+                                        <div class="sc-seal-ring r1"></div><div class="sc-seal-ring r2"></div><div class="sc-seal-core">ゾル</div>
+                                    </div>
+                                    <div class="sc-front-rarity combat">Tempur</div>
+                                </div>
+                                <div class="sc-back" style="--spell-color:#3b82f6; --spell-glow:rgba(59,130,246,0.3)">
+                                    <div class="sc-rarity-badge combat">⚔ Tempur</div>
+                                    <h3 class="sc-name">Zoltraak</h3>
+                                    <p class="sc-effect">Sihir penghancur standar (sihir ofensif iblis). Frieren mempelajarinya hingga bisa dilepaskan tanpa mantra.</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="sc-front-rarity useless">Koleksi Aneh</div>
-                        <p class="sc-front-hint">Sentuh untuk membuka segel</p>
                     </div>
-                    <div class="sc-back" style="--spell-color:#f472b6; --spell-glow:rgba(244,114,182,0.3)">
-                        <div class="sc-back-particles"></div>
-                        <div class="sc-rarity-badge useless">✿ Koleksi Aneh</div>
-                        <div class="sc-symbol">✿</div>
-                        <h3 class="sc-name">Mantra Bunga Mekar</h3>
-                        <div class="sc-jp">花の魔法</div>
-                        <p class="sc-effect">Membuat bunga mekar di sekitar pengguna. Frieren menghabiskan 30 tahun penuh mencarinya. Tidak berguna dalam pertarungan. Tapi ia tidak peduli.</p>
-                        <div class="sc-tags">
-                            <span>Tidak Berguna</span>
-                            <span>Indah</span>
-                            <span>30 Tahun Pencarian</span>
+                    <!-- Back: Bunga Mekar -->
+                    <div class="page-back">
+                        <div class="spell-card" data-rarity="useless" data-unlocked="false">
+                            <div class="sc-inner">
+                                <div class="sc-front">
+                                    <div class="sc-seal">
+                                        <div class="sc-seal-ring r1"></div><div class="sc-seal-ring r2"></div><div class="sc-seal-core">花</div>
+                                    </div>
+                                    <div class="sc-front-rarity useless">Aneh</div>
+                                </div>
+                                <div class="sc-back" style="--spell-color:#f472b6; --spell-glow:rgba(244,114,182,0.3)">
+                                    <div class="sc-rarity-badge useless">✿ Aneh</div>
+                                    <h3 class="sc-name">Bunga Mekar</h3>
+                                    <p class="sc-effect">Membuat bunga mekar. Frieren menghabiskan 30 tahun mencarinya.</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="sc-user">Pengguna: Frieren (Koleksi Pribadi)</div>
                     </div>
                 </div>
-            </div>
 
-            <!-- ── LÜGNER ── -->
-            <div class="spell-card" data-rarity="rare" data-unlocked="false">
-                <div class="sc-inner">
-                    <div class="sc-front">
-                        <div class="sc-seal">
-                            <div class="sc-seal-ring r1"></div>
-                            <div class="sc-seal-ring r2"></div>
-                            <div class="sc-seal-core">リュグナー</div>
+                <!-- ── HALAMAN 2 ── -->
+                <div class="book-page">
+                    <div class="page-front">
+                        <!-- Lügner -->
+                        <div class="spell-card" data-rarity="rare" data-unlocked="false">
+                            <div class="sc-inner">
+                                <div class="sc-front">
+                                    <div class="sc-seal">
+                                        <div class="sc-seal-ring r1"></div><div class="sc-seal-ring r2"></div><div class="sc-seal-core">影</div>
+                                    </div>
+                                    <div class="sc-front-rarity rare">Langka</div>
+                                </div>
+                                <div class="sc-back" style="--spell-color:#a78bfa; --spell-glow:rgba(167,139,250,0.3)">
+                                    <div class="sc-rarity-badge rare">◆ Langka</div>
+                                    <h3 class="sc-name">Lügner</h3>
+                                    <p class="sc-effect">Sihir ilusi bayangan tingkat tinggi milik iblis untuk menipu manusia.</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="sc-front-rarity rare">Langka</div>
-                        <p class="sc-front-hint">Sentuh untuk membuka segel</p>
                     </div>
-                    <div class="sc-back" style="--spell-color:#a78bfa; --spell-glow:rgba(167,139,250,0.3)">
-                        <div class="sc-back-particles"></div>
-                        <div class="sc-rarity-badge rare">◆ Langka</div>
-                        <div class="sc-symbol">◈</div>
-                        <h3 class="sc-name">Lügner und Betrüger</h3>
-                        <div class="sc-jp">リュグナー・ウント・ベトリューガー</div>
-                        <p class="sc-effect">Sihir ilusi tingkat tinggi milik iblis yang menciptakan bayangan sempurna. Iblis menggunakannya untuk menipu manusia — memanipulasi penglihatan dan memori.</p>
-                        <div class="sc-tags">
-                            <span>Ilusi</span>
-                            <span>Sihir Iblis</span>
-                            <span>Manipulasi</span>
+                    <div class="page-back">
+                        <!-- Cahaya Kunang -->
+                        <div class="spell-card" data-rarity="useless" data-unlocked="false">
+                            <div class="sc-inner">
+                                <div class="sc-front">
+                                    <div class="sc-seal">
+                                        <div class="sc-seal-ring r1"></div><div class="sc-seal-ring r2"></div><div class="sc-seal-core">光</div>
+                                    </div>
+                                    <div class="sc-front-rarity useless">Aneh</div>
+                                </div>
+                                <div class="sc-back" style="--spell-color:#fde68a; --spell-glow:rgba(253,230,138,0.3)">
+                                    <div class="sc-rarity-badge useless">✿ Aneh</div>
+                                    <h3 class="sc-name">Cahaya Kunang</h3>
+                                    <p class="sc-effect">Cahaya kecil yang mengikuti pengguna. Tidak cukup terang, tapi menenangkan.</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="sc-user">Pengguna: Iblis Kelas Atas</div>
                     </div>
                 </div>
-            </div>
 
-            <!-- ── CAHAYA KUNANG ── -->
-            <div class="spell-card" data-rarity="useless" data-unlocked="false">
-                <div class="sc-inner">
-                    <div class="sc-front">
-                        <div class="sc-seal">
-                            <div class="sc-seal-ring r1"></div>
-                            <div class="sc-seal-ring r2"></div>
-                            <div class="sc-seal-core">蛍の光</div>
+                <!-- ── HALAMAN 3 ── -->
+                <div class="book-page">
+                    <div class="page-front">
+                        <!-- Vollzitat -->
+                        <div class="spell-card" data-rarity="legendary" data-unlocked="false">
+                            <div class="sc-inner">
+                                <div class="sc-front">
+                                    <div class="sc-seal">
+                                        <div class="sc-seal-ring r1"></div><div class="sc-seal-ring r2"></div><div class="sc-seal-core">模</div>
+                                    </div>
+                                    <div class="sc-front-rarity legendary">Legend</div>
+                                </div>
+                                <div class="sc-back" style="--spell-color:#fbbf24; --spell-glow:rgba(251,191,36,0.4)">
+                                    <div class="sc-rarity-badge legendary">★ Legend</div>
+                                    <h3 class="sc-name">Vollzitat</h3>
+                                    <p class="sc-effect">Sihir imitasi milik Serie. Menyalin sempurna mantra apapun dengan melihatnya.</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="sc-front-rarity useless">Koleksi Aneh</div>
-                        <p class="sc-front-hint">Sentuh untuk membuka segel</p>
                     </div>
-                    <div class="sc-back" style="--spell-color:#fde68a; --spell-glow:rgba(253,230,138,0.3)">
-                        <div class="sc-back-particles"></div>
-                        <div class="sc-rarity-badge useless">✿ Koleksi Aneh</div>
-                        <div class="sc-symbol">◎</div>
-                        <h3 class="sc-name">Cahaya Kunang-Kunang</h3>
-                        <div class="sc-jp">蛍の光の魔法</div>
-                        <p class="sc-effect">Menciptakan titik cahaya kecil yang mengikuti pengguna seperti kunang-kunang. Tidak cukup terang untuk menerangi jalan, tidak bisa untuk bertarung. Tapi terasa hangat.</p>
-                        <div class="sc-tags">
-                            <span>Tidak Berguna</span>
-                            <span>Dekoratif</span>
-                            <span>Menenangkan</span>
+                    <div class="page-back">
+                        <!-- Aroma Hujan -->
+                        <div class="spell-card" data-rarity="useless" data-unlocked="false">
+                            <div class="sc-inner">
+                                <div class="sc-front">
+                                    <div class="sc-seal">
+                                        <div class="sc-seal-ring r1"></div><div class="sc-seal-ring r2"></div><div class="sc-seal-core">雨</div>
+                                    </div>
+                                    <div class="sc-front-rarity useless">Aneh</div>
+                                </div>
+                                <div class="sc-back" style="--spell-color:#5eecff; --spell-glow:rgba(94,236,255,0.3)">
+                                    <div class="sc-rarity-badge useless">✿ Aneh</div>
+                                    <h3 class="sc-name">Aroma Hujan</h3>
+                                    <p class="sc-effect">Menciptakan aroma udara setelah hujan bergantian dengan bunga.</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="sc-user">Pengguna: Frieren (Favorit)</div>
                     </div>
                 </div>
-            </div>
 
-            <!-- ── VOLLZITAT ── -->
-            <div class="spell-card" data-rarity="legendary" data-unlocked="false">
-                <div class="sc-inner">
-                    <div class="sc-front">
-                        <div class="sc-seal">
-                            <div class="sc-seal-ring r1"></div>
-                            <div class="sc-seal-ring r2"></div>
-                            <div class="sc-seal-core">ゼーリエ</div>
+                <!-- ── HALAMAN 4 (Deteksi & Graf Granat) ── -->
+                <div class="book-page">
+                    <div class="page-front">
+                        <!-- Deteksi -->
+                        <div class="spell-card" data-rarity="rare" data-unlocked="false">
+                            <div class="sc-inner">
+                                <div class="sc-front">
+                                    <div class="sc-seal">
+                                        <div class="sc-seal-ring r1"></div><div class="sc-seal-ring r2"></div><div class="sc-seal-core">感知</div>
+                                    </div>
+                                    <div class="sc-front-rarity rare">Langka</div>
+                                </div>
+                                <div class="sc-back" style="--spell-color:#f87171; --spell-glow:rgba(248,113,113,0.3)">
+                                    <div class="sc-rarity-badge rare">◆ Langka</div>
+                                    <h3 class="sc-name">Deteksi Bunuh</h3>
+                                    <p class="sc-effect">Mendeteksi niat membunuh sekecil apapun dari iblis. Kunci kemenangan Frieren.</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="sc-front-rarity legendary">Legendaris</div>
-                        <p class="sc-front-hint">Sentuh untuk membuka segel</p>
                     </div>
-                    <div class="sc-back" style="--spell-color:#fbbf24; --spell-glow:rgba(251,191,36,0.4)">
-                        <div class="sc-back-particles"></div>
-                        <div class="sc-rarity-badge legendary">★ Legendaris</div>
-                        <div class="sc-symbol">✦</div>
-                        <h3 class="sc-name">Vollzitat</h3>
-                        <div class="sc-jp">フォルツィタート</div>
-                        <p class="sc-effect">Sihir imitasi milik Serie — penyihir terkuat yang masih hidup. Dapat menyalin sempurna mantra apapun hanya dengan melihatnya sekali. Mustahil dipelajari oleh kebanyakan penyihir.</p>
-                        <div class="sc-tags">
-                            <span>Salin Sihir</span>
-                            <span>Milik Serie</span>
-                            <span>Tidak Tertandingi</span>
+                    <div class="page-back">
+                        <!-- Graf Granat -->
+                        <div class="spell-card" data-rarity="legendary" data-unlocked="false">
+                            <div class="sc-inner">
+                                <div class="sc-front">
+                                    <div class="sc-seal">
+                                        <div class="sc-seal-ring r1"></div><div class="sc-seal-ring r2"></div><div class="sc-seal-core">爆発</div>
+                                    </div>
+                                    <div class="sc-front-rarity legendary">Legend</div>
+                                </div>
+                                <div class="sc-back" style="--spell-color:#fbbf24; --spell-glow:rgba(251,191,36,0.45)">
+                                    <div class="sc-rarity-badge legendary">★ Legend</div>
+                                    <h3 class="sc-name">Graf Granat</h3>
+                                    <p class="sc-effect">Sihir ledakan penghancur tertinggi kelas atas.</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="sc-user">Pengguna: Serie (Penyihir Pertama)</div>
                     </div>
                 </div>
-            </div>
 
-            <!-- ── MAKANAN ENAK ── -->
-            <div class="spell-card" data-rarity="useless" data-unlocked="false">
-                <div class="sc-inner">
-                    <div class="sc-front">
-                        <div class="sc-seal">
-                            <div class="sc-seal-ring r1"></div>
-                            <div class="sc-seal-ring r2"></div>
-                            <div class="sc-seal-core">料理魔法</div>
+                <!-- ── COVER BELAKANG ── -->
+                <div class="book-page">
+                    <div class="page-front">
+                        <div class="page-content">
+                            <h3>Akhir Buku</h3>
+                            <p>Buku ini mungkin terlihat usang, tapi magisnya tidak pudar termakan waktu.</p>
                         </div>
-                        <div class="sc-front-rarity useless">Koleksi Aneh</div>
-                        <p class="sc-front-hint">Sentuh untuk membuka segel</p>
                     </div>
-                    <div class="sc-back" style="--spell-color:#fb923c; --spell-glow:rgba(251,146,60,0.3)">
-                        <div class="sc-back-particles"></div>
-                        <div class="sc-rarity-badge useless">✿ Koleksi Aneh</div>
-                        <div class="sc-symbol">◉</div>
-                        <h3 class="sc-name">Mantra Rasa Makanan</h3>
-                        <div class="sc-jp">料理の魔法</div>
-                        <p class="sc-effect">Membuat rasa makanan sedikit lebih enak. Hanya "sedikit". Tidak bisa mengubah makanan basi jadi segar. Tidak berguna sama sekali dalam situasi apapun. Frieren tetap menyimpannya.</p>
-                        <div class="sc-tags">
-                            <span>Tidak Berguna</span>
-                            <span>Kuliner</span>
-                            <span>"Sedikit" Lebih Enak</span>
+                    <div class="page-back cover-back">
+                        <div class="cover-design">
+                            <div class="cover-seal"></div>
                         </div>
-                        <div class="sc-user">Pengguna: Frieren (Dipakai Tiap Makan)</div>
                     </div>
                 </div>
-            </div>
 
-            <!-- ── DETEKSI NIAT BUNUH ── -->
-            <div class="spell-card" data-rarity="rare" data-unlocked="false">
-                <div class="sc-inner">
-                    <div class="sc-front">
-                        <div class="sc-seal">
-                            <div class="sc-seal-ring r1"></div>
-                            <div class="sc-seal-ring r2"></div>
-                            <div class="sc-seal-core">殺意感知</div>
-                        </div>
-                        <div class="sc-front-rarity rare">Langka</div>
-                        <p class="sc-front-hint">Sentuh untuk membuka segel</p>
-                    </div>
-                    <div class="sc-back" style="--spell-color:#f87171; --spell-glow:rgba(248,113,113,0.3)">
-                        <div class="sc-back-particles"></div>
-                        <div class="sc-rarity-badge rare">◆ Langka</div>
-                        <div class="sc-symbol">⊗</div>
-                        <h3 class="sc-name">Deteksi Niat Membunuh</h3>
-                        <div class="sc-jp">殺意感知の魔法</div>
-                        <p class="sc-effect">Dikembangkan Frieren setelah mempelajari iblis selama berabad-abad. Iblis bisa menyembunyikan mana mereka, tapi tidak bisa menyembunyikan niat untuk membunuh. Ini yang membuat Frieren tidak terkalahkan melawan iblis.</p>
-                        <div class="sc-tags">
-                            <span>Anti-Iblis</span>
-                            <span>Deteksi</span>
-                            <span>Ciptaan Frieren</span>
-                        </div>
-                        <div class="sc-user">Pengguna: Frieren (Original)</div>
-                    </div>
-                </div>
             </div>
-
-            <!-- ── AROMA HUJAN ── -->
-            <div class="spell-card" data-rarity="useless" data-unlocked="false">
-                <div class="sc-inner">
-                    <div class="sc-front">
-                        <div class="sc-seal">
-                            <div class="sc-seal-ring r1"></div>
-                            <div class="sc-seal-ring r2"></div>
-                            <div class="sc-seal-core">雨の香り</div>
-                        </div>
-                        <div class="sc-front-rarity useless">Koleksi Aneh</div>
-                        <p class="sc-front-hint">Sentuh untuk membuka segel</p>
-                    </div>
-                    <div class="sc-back" style="--spell-color:#5eecff; --spell-glow:rgba(94,236,255,0.3)">
-                        <div class="sc-back-particles"></div>
-                        <div class="sc-rarity-badge useless">✿ Koleksi Aneh</div>
-                        <div class="sc-symbol">◌</div>
-                        <h3 class="sc-name">Aroma Hujan Bunga</h3>
-                        <div class="sc-jp">雨上がりの花の香り</div>
-                        <p class="sc-effect">Menciptakan aroma udara setelah hujan bercampur harum bunga. Tidak ada efek bertarung. Tidak bisa digunakan untuk apapun yang berguna. Hanya baunya saja. Frieren senang.</p>
-                        <div class="sc-tags">
-                            <span>Tidak Berguna</span>
-                            <span>Aromaterapi</span>
-                            <span>Menyenangkan</span>
-                        </div>
-                        <div class="sc-user">Pengguna: Frieren (Dipakai Santai)</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ── GRAF GRANAT ── -->
-            <div class="spell-card" data-rarity="legendary" data-unlocked="false">
-                <div class="sc-inner">
-                    <div class="sc-front">
-                        <div class="sc-seal">
-                            <div class="sc-seal-ring r1"></div>
-                            <div class="sc-seal-ring r2"></div>
-                            <div class="sc-seal-core">グラフ</div>
-                        </div>
-                        <div class="sc-front-rarity legendary">Legendaris</div>
-                        <p class="sc-front-hint">Sentuh untuk membuka segel</p>
-                    </div>
-                    <div class="sc-back" style="--spell-color:#fbbf24; --spell-glow:rgba(251,191,36,0.45)">
-                        <div class="sc-back-particles"></div>
-                        <div class="sc-rarity-badge legendary">★ Legendaris</div>
-                        <div class="sc-symbol">✦</div>
-                        <h3 class="sc-name">Graf Granat</h3>
-                        <div class="sc-jp">グラフ・グラナト</div>
-                        <p class="sc-effect">Sihir ledakan penghancur kelas tertinggi. Versi paling mematikan dari sihir ofensif yang diketahui manusia. Frieren menguasainya dalam semalam setelah melihatnya sekali — membuktikan jurang kemampuannya dengan penyihir biasa.</p>
-                        <div class="sc-tags">
-                            <span>Penghancur Massal</span>
-                            <span>Kelas Tertinggi</span>
-                            <span>Satu Malam Belajar</span>
-                        </div>
-                        <div class="sc-user">Pengguna: Frieren · Pemimpin Iblis</div>
-                    </div>
-                </div>
-            </div>
-
-        </div><!-- end spells-grid -->
-        
-        <button class="spell-nav-btn spell-next" id="spellNext">❯</button>
-        </div><!-- end spells-slider-wrap -->
+            
+            <button class="spell-nav-btn spell-next" id="bookNext" style="right: 5px; z-index: 20;">❯</button>
+        </div><!-- end grimoire-wrapper -->
 
         <!-- Counter -->
         <div class="spells-counter">
