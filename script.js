@@ -118,7 +118,15 @@
         };
     }
 
+    let isHeroVisible = true;
+    const heroObs = new IntersectionObserver(e => isHeroVisible = e[0].isIntersecting);
+    const heroSec = document.getElementById('inicio');
+    if(heroSec) heroObs.observe(heroSec);
+
     function drawParticles() {
+        requestAnimationFrame(drawParticles);
+        if (!isHeroVisible) return;
+
         ctx.clearRect(0, 0, W, H);
 
         if (particles.length < 60 && Math.random() < 0.4) {
@@ -146,8 +154,6 @@
 
             if (p.life >= p.maxL) particles.splice(i, 1);
         }
-
-        requestAnimationFrame(drawParticles);
     }
 
     drawParticles();
@@ -1345,10 +1351,16 @@ console.log('⌨  Arrow keys: navigate character slider');
         mouseX = 0; mouseY = 0;
     });
 
+    let isThreeVisible = true;
+    const threeObs = new IntersectionObserver(e => isThreeVisible = e[0].isIntersecting);
+    threeObs.observe(container);
+
     let time = 0;
 
     function animate() {
         requestAnimationFrame(animate);
+        if (!isThreeVisible) return;
+        
         time += 0.01;
 
         // Smooth mouse rotation
@@ -1488,6 +1500,10 @@ console.log('⌨  Arrow keys: navigate character slider');
         particles.push(new AuraParticle());
     }
 
+    let isAuraVisible = true;
+    const auraObs = new IntersectionObserver(e => isAuraVisible = e[0].isIntersecting);
+    auraObs.observe(container);
+
     let time = 0;
 
     function drawManaFlame() {
@@ -1540,6 +1556,9 @@ console.log('⌨  Arrow keys: navigate character slider');
     }
 
     function animate() {
+        requestAnimationFrame(animate);
+        if (!isAuraVisible) return;
+
         ctx.clearRect(0, 0, W, H);
         ctx.globalCompositeOperation = 'screen';
         
@@ -1552,9 +1571,29 @@ console.log('⌨  Arrow keys: navigate character slider');
         });
 
         time += 0.02;
-        requestAnimationFrame(animate);
     }
 
     animate();
     console.log('✨ Efek Mana Release (Aura Frieren) aktif');
+})();
+
+// ──────────────────────────────────────────────────────────────
+// 18. SPELL CAROUSEL LOGIC
+// ──────────────────────────────────────────────────────────────
+(function initSpellCarousel() {
+    const spellGrid = document.getElementById('spellsGrid');
+    const spellPrev = document.getElementById('spellPrev');
+    const spellNext = document.getElementById('spellNext');
+
+    if (!spellGrid || !spellPrev || !spellNext) return;
+
+    spellPrev.addEventListener('click', () => {
+        const cardWidth = spellGrid.querySelector('.spell-card')?.offsetWidth || 300;
+        spellGrid.scrollBy({ left: -(cardWidth + 24), behavior: 'smooth' });
+    });
+
+    spellNext.addEventListener('click', () => {
+        const cardWidth = spellGrid.querySelector('.spell-card')?.offsetWidth || 300;
+        spellGrid.scrollBy({ left: cardWidth + 24, behavior: 'smooth' });
+    });
 })();
