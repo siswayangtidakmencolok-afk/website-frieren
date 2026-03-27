@@ -1229,6 +1229,92 @@ console.log('⌨  Arrow keys: navigate character slider');
         particles.add(mesh);
     }
 
+    // 3. PEDANG HIMMEL (Hero's Sword)
+    const swordGroup = new THREE.Group();
+    scene.add(swordGroup);
+
+    const bladeGeo = new THREE.CylinderGeometry(0.01, 0.35, 6, 4);
+    const bladeMat = new THREE.MeshStandardMaterial({
+        color: 0xcccccc,
+        metalness: 0.8,
+        roughness: 0.3
+    });
+    const blade = new THREE.Mesh(bladeGeo, bladeMat);
+    blade.position.y = 1.5;
+    blade.rotation.y = Math.PI / 4;
+    swordGroup.add(blade);
+
+    const guardGeo = new THREE.BoxGeometry(2.5, 0.3, 0.3);
+    const guardMat = new THREE.MeshStandardMaterial({
+        color: 0xeebbaa,
+        metalness: 0.8,
+        roughness: 0.4
+    });
+    const guard = new THREE.Mesh(guardGeo, guardMat);
+    guard.position.y = -1.5;
+    swordGroup.add(guard);
+
+    const gripGeo = new THREE.CylinderGeometry(0.12, 0.1, 1.5, 16);
+    const gripMat = new THREE.MeshStandardMaterial({
+        color: 0x1a2b4c,
+        roughness: 0.9
+    });
+    const grip = new THREE.Mesh(gripGeo, gripMat);
+    grip.position.y = -2.4;
+    swordGroup.add(grip);
+
+    const pommelGeo = new THREE.SphereGeometry(0.25, 16, 16);
+    const pommel = new THREE.Mesh(pommelGeo, guardMat);
+    pommel.position.y = -3.2;
+    swordGroup.add(pommel);
+
+    // Light specific to Sword
+    const swordLight = new THREE.PointLight(0xffeedd, 0.8, 10);
+    swordLight.position.set(0, 0, 2);
+    swordGroup.add(swordLight);
+
+    // Initial setup for slider
+    let currentRelic = 0; // 0: Staff, 1: Sword
+    let targetXStaff = 0;
+    let targetXSword = 30;
+    
+    group.position.x = 0;
+    particles.position.x = 0;
+    swordGroup.position.x = 30;
+
+    const relicData = [
+        { title: "Tongkat Sihir Frieren", desc: "Zoltraak & Partikel Mana | Geser kursor Anda" },
+        { title: "Pedang Pahlawan Himmel", desc: "Baja Murni & Harapan | Geser kursor Anda" }
+    ];
+
+    const btnPrev = document.getElementById('relicPrev');
+    const btnNext = document.getElementById('relicNext');
+    const titleEl = document.getElementById('relicTitle');
+    const descEl = document.getElementById('relicDesc');
+    const dots = document.querySelectorAll('.rd-dot');
+
+    function updateRelicUI() {
+        if(titleEl) titleEl.textContent = relicData[currentRelic].title;
+        if(descEl) descEl.textContent = relicData[currentRelic].desc;
+        dots.forEach((d, i) => d.classList.toggle('active', i === currentRelic));
+    }
+
+    function switchRelic(dir) {
+        if(dir === 1) { // Next
+            currentRelic = 1;
+            targetXStaff = -30;
+            targetXSword = 0;
+        } else { // Prev
+            currentRelic = 0;
+            targetXStaff = 0;
+            targetXSword = 30;
+        }
+        updateRelicUI();
+    }
+
+    if(btnNext) btnNext.addEventListener('click', () => switchRelic(1));
+    if(btnPrev) btnPrev.addEventListener('click', () => switchRelic(-1));
+
     // LIGHTS
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
@@ -1271,14 +1357,16 @@ console.log('⌨  Arrow keys: navigate character slider');
         group.rotation.y += 0.05 * (targetX - group.rotation.y);
         group.rotation.x += 0.05 * (targetY - group.rotation.x);
 
-        // Hover effect for the staff
+        // Lerp Slider Transitions
+        group.position.x += (targetXStaff - group.position.x) * 0.05;
+        particles.position.x += (targetXStaff - particles.position.x) * 0.05;
+        swordGroup.position.x += (targetXSword - swordGroup.position.x) * 0.05;
+
+        // Animations - Staff
         group.position.y = Math.sin(time * 2) * 0.3;
-        
-        // Spin gem
         gem.rotation.y += 0.02;
         gem.rotation.x += 0.01;
 
-        // Orbit particles
         particles.children.forEach(p => {
             p.userData.angle += p.userData.speed;
             p.position.x = Math.cos(p.userData.angle) * p.userData.radius;
@@ -1287,6 +1375,11 @@ console.log('⌨  Arrow keys: navigate character slider');
             p.rotation.x += 0.01;
             p.rotation.y += 0.02;
         });
+
+        // Animations - Sword
+        swordGroup.position.y = Math.sin(time * 2.5) * 0.2;
+        swordGroup.rotation.y += 0.05 * (targetX - swordGroup.rotation.y);
+        swordGroup.rotation.x += 0.05 * (targetY - swordGroup.rotation.x);
 
         renderer.render(scene, camera);
     }
@@ -1300,4 +1393,168 @@ console.log('⌨  Arrow keys: navigate character slider');
         camera.updateProjectionMatrix();
         renderer.setSize(container.clientWidth, container.clientHeight);
     });
+})();
+
+// ──────────────────────────────────────────────────────────────
+// 17. FRIEREN MANA BURST AURA EFFECT (Efek Lepas Mana)
+// ──────────────────────────────────────────────────────────────
+(function initFrierenManaAura() {
+    const container = document.getElementById('heroLayerChar');
+    if (!container) return;
+    
+    // Inject Canvas behind Frieren Image
+    const canvas = document.createElement('canvas');
+    canvas.className = 'frieren-mana-canvas';
+    container.insertBefore(canvas, container.firstChild);
+
+    const ctx = canvas.getContext('2d');
+    let W, H;
+    const particles = [];
+
+    function resize() {
+        W = canvas.width  = container.offsetWidth;
+        H = canvas.height = container.offsetHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    Object.assign(canvas.style, {
+        position: 'absolute',
+        inset: '0',
+        width: '100%',
+        height: '100%',
+        zIndex: '1',
+        pointerEvents: 'none',
+        mixBlendMode: 'screen',
+        opacity: '0.9'
+    });
+    
+    const img = container.querySelector('img');
+    if (img) {
+        img.style.position = 'relative';
+        img.style.zIndex = '2';
+    }
+
+    class AuraParticle {
+        constructor() {
+            this.reset(true);
+        }
+        reset(randomY = false) {
+            this.x = W * 0.25 + Math.random() * (W * 0.7);
+            this.y = randomY ? Math.random() * H : H + 50;
+            this.vx = (Math.random() - 0.5) * 1.5;
+            this.vy = -(1.5 + Math.random() * 4);
+            this.radius = 1 + Math.random() * 5;
+            this.life = 0;
+            this.maxLife = 80 + Math.random() * 120;
+            this.hue = 180 + Math.random() * 50; 
+            this.alpha = 0;
+            this.sparkle = Math.random() > 0.8;
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            
+            this.vx += Math.sin(this.life * 0.04) * 0.08;
+            
+            this.life++;
+            let progress = this.life / this.maxLife;
+            
+            if (progress < 0.2) {
+                this.alpha = progress / 0.2;
+            } else if (progress > 0.8) {
+                this.alpha = (1 - progress) / 0.2;
+            } else {
+                this.alpha = 1;
+            }
+
+            if (this.sparkle && Math.random() > 0.8) {
+                this.alpha = Math.random();
+            }
+
+            if (this.life >= this.maxLife) this.reset();
+        }
+        draw(ctx) {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = `hsla(${this.hue}, 100%, 75%, ${this.alpha * 0.85})`;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = `hsl(${this.hue}, 100%, 75%)`;
+            ctx.fill();
+        }
+    }
+
+    for (let i = 0; i < 200; i++) {
+        particles.push(new AuraParticle());
+    }
+
+    let time = 0;
+
+    function drawManaFlame() {
+        ctx.save();
+        ctx.shadowBlur = 40;
+        ctx.shadowColor = '#5eecff';
+        ctx.lineCap = 'round';
+
+        for (let i = 0; i < 7; i++) {
+            ctx.beginPath();
+            ctx.lineWidth = 12 + Math.sin(time + i) * 6;
+            ctx.strokeStyle = `rgba(94, 236, 255, ${0.12 + Math.sin(time * 2 + i) * 0.08})`;
+            
+            const startX = W * 0.6 + (i - 3) * 60;
+            ctx.moveTo(startX, H + 20);
+            
+            for (let y = H + 20; y > H * 0.1; y -= 30) {
+                const xOffset = Math.sin(y * 0.005 - time * 5 + i) * (100 - i * 8);
+                ctx.lineTo(startX + xOffset, y);
+            }
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    function drawMagicRings() {
+        ctx.save();
+        ctx.translate(W * 0.7, H * 0.5);
+        ctx.rotate(-time * 0.3);
+
+        ctx.shadowBlur = 25;
+        ctx.shadowColor = '#a78bfa';
+        ctx.strokeStyle = `rgba(167, 139, 250, ${0.2 + Math.sin(time * 2) * 0.1})`;
+
+        for (let r = 0; r < 3; r++) {
+            ctx.beginPath();
+            ctx.lineWidth = 2 + r * 1.5;
+            const radius = 180 + r * 70 + Math.sin(time * 1.5 + r) * 15;
+            ctx.arc(0, 0, radius, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.lineWidth = 3;
+            ctx.setLineDash([20, 30]);
+            ctx.arc(0, 0, radius + 25, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+        ctx.restore();
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, W, H);
+        ctx.globalCompositeOperation = 'screen';
+        
+        drawMagicRings();
+        drawManaFlame();
+
+        particles.forEach(p => {
+            p.update();
+            p.draw(ctx);
+        });
+
+        time += 0.02;
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+    console.log('✨ Efek Mana Release (Aura Frieren) aktif');
 })();

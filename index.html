@@ -932,9 +932,22 @@ Taruh SETELAH <section class="image-slider-section"> dan SEBELUM <section class=
 
         <!-- THREE.JS PROCEDURAL RELIC -->
         <div class="showcase-card threejs-card">
-            <h3>Tongkat Sihir & Energi Mana</h3>
-            <p class="card-hint">Geser kursor Anda di area ini</p>
-            <div class="three-canvas-wrap" id="threeCanvasContainer"></div>
+            <div class="relic-header">
+                <h3 id="relicTitle">Tongkat Sihir Frieren</h3>
+                <p class="card-hint" id="relicDesc">Geser kursor Anda di area ini</p>
+            </div>
+
+            <div class="three-canvas-wrap" id="threeCanvasContainer">
+                <div class="relic-nav">
+                    <button class="rn-btn" id="relicPrev">❮</button>
+                    <button class="rn-btn" id="relicNext">❯</button>
+                </div>
+            </div>
+
+            <div class="relic-dots" id="relicDots">
+                <span class="rd-dot active"></span>
+                <span class="rd-dot"></span>
+            </div>
         </div>
     </div>
 </section>
