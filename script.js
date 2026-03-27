@@ -938,3 +938,334 @@ function setCharUrl(charKey, url) {
         console.log(`[Electric] URL ${charKey} diupdate: ${url}`);
     }
 }
+
+// ============================================================
+// TYPING QUOTE SECTION — Engine lengkap
+// Tambah di paling bawah script.js
+// ============================================================
+
+// ──────────────────────────────────────────────────────────────
+// DATA QUOTES — 7 kutipan paling emosional dari Frieren
+// ──────────────────────────────────────────────────────────────
+const QUOTES = [
+    {
+        char    : 'frieren',
+        name    : 'Frieren',
+        role    : 'Penyihir Elf · Kelompok Pahlawan',
+        img     : 'images/character-frieren.png',
+        color   : '#5eecff',
+        text    : 'Aku baru menyadari... aku tidak pernah benar-benar mengenalnya. Dan sekarang sudah terlambat untuk itu.',
+        context : 'Episode 1 · Pemakaman Himmel',
+        reflect : 'Satu kalimat yang menggambarkan seluruh inti cerita Frieren — tentang waktu yang berlalu dan penyesalan yang datang terlambat. Bagi elf yang sudah ribuan tahun hidup, sepuluh tahun bersama terasa seperti sekejap. Tapi kematian Himmel membuktikan: panjangnya waktu tidak ada artinya kalau tidak pernah diisi dengan sungguh-sungguh.',
+    },
+    {
+        char    : 'himmel',
+        name    : 'Himmel',
+        role    : 'Pahlawan · Pemimpin Kelompok',
+        img     : 'images/character-himmel.png',
+        color   : '#fbbf24',
+        text    : 'Apakah perlu alasan untuk menolong seseorang? Aku hanya melakukan apa yang memang harus dilakukan.',
+        context : 'Sepanjang perjalanan · Filosofi Himmel',
+        reflect : 'Himmel tidak pernah menolong karena ingin dikenang. Ia menolong karena menurutnya itu yang benar. Patungnya ada di seluruh dunia bukan karena ia minta, melainkan karena orang-orang yang ia selamatkan tidak punya cara lain untuk berterima kasih.',
+    },
+    {
+        char    : 'frieren',
+        name    : 'Frieren',
+        role    : 'Penyihir Elf · Kelompok Pahlawan',
+        img     : 'images/character-frieren.png',
+        color   : '#5eecff',
+        text    : 'Manusia memang makhluk yang aneh. Hanya hidup sebentar, tapi bisa meninggalkan kenangan yang bertahan berabad-abad.',
+        context : 'Sepanjang seri · Refleksi Frieren',
+        reflect : 'Di sinilah ironi terbesar Frieren — ia yang abadi justru belajar tentang makna hidup dari mereka yang hidupnya paling singkat. Himmel, Heiter, Eisen... mereka sudah tiada, tapi jejak mereka masih membawa Frieren berjalan.',
+    },
+    {
+        char    : 'heiter',
+        name    : 'Heiter',
+        role    : 'Pendeta Agung · Kelompok Pahlawan',
+        img     : 'images/character-heiter.png',
+        color   : '#facc15',
+        text    : 'Frieren... tolong jaga Fern. Itu satu-satunya permintaanku.',
+        context : 'Pertemuan terakhir · Permintaan Heiter',
+        reflect : 'Kata-kata terakhir dari seseorang yang tahu dirinya tidak punya banyak waktu lagi. Heiter tidak meminta banyak — hanya satu hal. Dan Frieren menerimanya tanpa ragu, tanpa kata-kata berlebihan. Itulah cara mereka menghormati satu sama lain.',
+    },
+    {
+        char    : 'fern',
+        name    : 'Fern',
+        role    : 'Penyihir · Murid Frieren',
+        img     : 'images/character-fern.png',
+        color   : '#a78bfa',
+        text    : 'Guru tidak pernah bertanya apakah aku baik-baik saja. Tapi saat aku benar-benar membutuhkan, ia selalu ada.',
+        context : 'Refleksi Fern · Tentang Frieren',
+        reflect : 'Hubungan Frieren dan Fern tidak dibangun dengan kata-kata hangat atau perhatian yang ditunjukkan secara eksplisit. Ia dibangun lewat kehadiran yang konsisten — dan bagi Fern yang kehilangan segalanya, kehadiran itu lebih dari cukup.',
+    },
+    {
+        char    : 'stark',
+        name    : 'Stark',
+        role    : 'Pejuang · Murid Eisen',
+        img     : 'images/character-stark.png',
+        color   : '#f97316',
+        text    : 'Aku bukan pemberani. Aku hanya tidak bisa berdiam diri saat orang yang penting bagiku dalam bahaya.',
+        context : 'Mid-series · Pengakuan Stark',
+        reflect : 'Stark selalu menganggap dirinya penakut. Tapi tubuhnya bergerak duluan setiap kali seseorang yang ia cintai terancam. Mungkin itu definisi keberanian yang sebenarnya — bukan tanpa rasa takut, tapi bertindak meski takut.',
+    },
+    {
+        char    : 'serie',
+        name    : 'Serie',
+        role    : 'Penyihir Terkuat · Guru Frieren',
+        img     : 'images/character-serie.png',
+        color   : '#ec4899',
+        text    : 'Sihir bukanlah tentang kekuatan. Ia tentang seberapa dalam kamu memahami dunia di sekitarmu.',
+        context : 'Filosofi Sihir · Dunia Frieren',
+        reflect : 'Serie, penyihir tertua yang masih hidup, memandang sihir bukan sebagai senjata melainkan sebagai pemahaman. Frieren yang telah hidup ribuan tahun pun masih terus belajar — dan itulah yang membuatnya berbeda dari penyihir biasa.',
+    },
+];
+
+// ──────────────────────────────────────────────────────────────
+// PARTICLE ENGINE — floating ambient dots
+// ──────────────────────────────────────────────────────────────
+function initQuoteParticles() {
+    const canvas = document.getElementById('quoteParticles');
+    if (!canvas) return;
+    const ctx  = canvas.getContext('2d');
+    let W, H, particles = [], raf;
+
+    function resize() {
+        const section = canvas.closest('.quote-section');
+        if (!section) return;
+        const rect = section.getBoundingClientRect();
+        W = canvas.width  = rect.width;
+        H = canvas.height = rect.height;
+    }
+
+    function spawn() {
+        return {
+            x    : Math.random() * W,
+            y    : H + 20,
+            r    : 0.8 + Math.random() * 1.8,
+            vx   : (Math.random() - 0.5) * 0.4,
+            vy   : -(0.3 + Math.random() * 0.6),
+            life : 0,
+            maxL : 200 + Math.random() * 200,
+            hue  : Math.random() > 0.6 ? 195 : (Math.random() > 0.5 ? 270 : 195),
+        };
+    }
+
+    function loop() {
+        ctx.clearRect(0, 0, W, H);
+
+        // Spawn
+        if (particles.length < 55 && Math.random() < 0.35) particles.push(spawn());
+
+        particles = particles.filter(p => {
+            p.x   += p.vx;
+            p.y   += p.vy;
+            p.life++;
+            const alpha = Math.sin((p.life / p.maxL) * Math.PI) * 0.45;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = `hsla(${p.hue}, 80%, 72%, ${alpha})`;
+            ctx.fill();
+            return p.life < p.maxL && p.y > -20;
+        });
+
+        raf = requestAnimationFrame(loop);
+    }
+
+    const resizeObs = new ResizeObserver(resize);
+    resizeObs.observe(canvas.closest('.quote-section') || document.body);
+    resize();
+    loop();
+}
+
+// ──────────────────────────────────────────────────────────────
+// TYPING ENGINE
+// ──────────────────────────────────────────────────────────────
+(function initQuoteTyping() {
+    const stage       = document.getElementById('quoteStage');
+    const typedEl     = document.getElementById('qtTyped');
+    const cursorEl    = document.getElementById('qtCursor');
+    const reflectEl   = document.getElementById('quoteReflection');
+    const charImgEl   = document.getElementById('quoteCharImg');
+    const fallbackEl  = document.getElementById('qcaFallback');
+    const charNameEl  = document.getElementById('quoteCharName');
+    const charRoleEl  = document.getElementById('quoteCharRole');
+    const contextEl   = document.getElementById('quoteContext');
+    const dotsEl      = document.getElementById('quoteDots');
+    const prevBtn     = document.getElementById('quotePrev');
+    const nextBtn     = document.getElementById('quoteNext');
+    const replayBtn   = document.getElementById('quoteReplay');
+    const currNumEl   = document.getElementById('quoteCurrentNum');
+    const totalNumEl  = document.getElementById('quoteTotalNum');
+
+    if (!stage || !typedEl) return;
+
+    let currentIdx = 0;
+    let typingTimer = null;
+    let isTyping    = false;
+
+    // Total display
+    if (totalNumEl) totalNumEl.textContent = String(QUOTES.length).padStart(2, '0');
+
+    // ── Build dots ──
+    if (dotsEl) {
+        QUOTES.forEach((_, i) => {
+            const d = document.createElement('button');
+            d.className   = 'qdot' + (i === 0 ? ' active' : '');
+            d.setAttribute('aria-label', `Quote ${i + 1}`);
+            d.addEventListener('click', () => goTo(i));
+            dotsEl.appendChild(d);
+        });
+    }
+
+    function updateDots() {
+        document.querySelectorAll('.qdot').forEach((d, i) => {
+            d.classList.toggle('active', i === currentIdx);
+        });
+    }
+
+    // ── Render a quote ──
+    function render(idx) {
+        const q = QUOTES[idx];
+        if (!q) return;
+
+        // Stop any ongoing typing
+        clearTimeout(typingTimer);
+        isTyping = false;
+
+        // Glow class
+        const glowClasses = ['glow-frieren','glow-himmel','glow-fern','glow-heiter','glow-stark','glow-eisen','glow-serie'];
+        stage.classList.remove(...glowClasses);
+        stage.classList.add('glow-' + q.char);
+
+        // Character info
+        if (charImgEl) {
+            charImgEl.src   = q.img;
+            charImgEl.style.display = '';
+        }
+        if (fallbackEl) fallbackEl.textContent = q.name.charAt(0);
+        if (charNameEl) charNameEl.textContent = q.name;
+        if (charRoleEl) charRoleEl.textContent = q.role;
+        if (contextEl)  contextEl.textContent  = q.context;
+        if (currNumEl)  currNumEl.textContent  = String(idx + 1).padStart(2, '0');
+
+        // Update cursor color via DOM
+        if (cursorEl) {
+            cursorEl.style.color = q.color;
+        }
+
+        // Hide reflection
+        if (reflectEl) {
+            reflectEl.textContent = q.reflect;
+            reflectEl.classList.remove('visible');
+        }
+
+        // Reset typed text
+        if (typedEl) typedEl.textContent = '';
+
+        // Start typing
+        typeText(q.text, 0, q);
+
+        // Update dots + buttons
+        updateDots();
+        if (prevBtn) prevBtn.disabled = idx === 0;
+        if (nextBtn) nextBtn.disabled = idx === QUOTES.length - 1;
+    }
+
+    function typeText(text, i, q) {
+        if (i > text.length) {
+            isTyping = false;
+            // Show cursor still then fade reflection in
+            setTimeout(() => {
+                if (reflectEl) reflectEl.classList.add('visible');
+            }, 600);
+            return;
+        }
+
+        isTyping = true;
+        if (typedEl) typedEl.textContent = text.slice(0, i);
+
+        // Vary speed: slower at punctuation, faster in the middle
+        const ch  = text[i - 1] || '';
+        const pauseChars = [',', '.', '!', '?', '—', '...', '\n'];
+        let delay = 38 + Math.random() * 22;
+        if (pauseChars.some(p => ch === p)) delay = 220 + Math.random() * 180;
+        if (ch === '.' || ch === '?') delay = 350;
+
+        typingTimer = setTimeout(() => typeText(text, i + 1, q), delay);
+    }
+
+    // ── Navigation ──
+    function goTo(idx, animate = true) {
+        if (idx < 0 || idx >= QUOTES.length) return;
+
+        if (animate) {
+            stage.style.opacity   = '0';
+            stage.style.transform = 'translateY(12px)';
+            stage.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+            setTimeout(() => {
+                currentIdx = idx;
+                render(idx);
+                stage.style.opacity   = '1';
+                stage.style.transform = 'translateY(0)';
+            }, 260);
+        } else {
+            currentIdx = idx;
+            render(idx);
+        }
+    }
+
+    // Buttons
+    if (prevBtn) prevBtn.addEventListener('click', () => goTo(currentIdx - 1));
+    if (nextBtn) nextBtn.addEventListener('click', () => goTo(currentIdx + 1));
+    if (replayBtn) replayBtn.addEventListener('click', () => {
+        clearTimeout(typingTimer);
+        if (typedEl) typedEl.textContent = '';
+        if (reflectEl) reflectEl.classList.remove('visible');
+        typeText(QUOTES[currentIdx].text, 0, QUOTES[currentIdx]);
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', e => {
+        const section = document.getElementById('quotes');
+        if (!section) return;
+        const rect = section.getBoundingClientRect();
+        if (rect.top > window.innerHeight || rect.bottom < 0) return;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(currentIdx + 1);
+        if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goTo(currentIdx - 1);
+    });
+
+    // Auto-advance — hanya jika typing sudah selesai dan refleksi sudah muncul
+    let autoTimer;
+    function scheduleAuto() {
+        clearTimeout(autoTimer);
+        autoTimer = setTimeout(() => {
+            if (currentIdx < QUOTES.length - 1) {
+                goTo(currentIdx + 1);
+                scheduleAuto();
+            }
+        }, 12000); // 12 detik per quote
+    }
+
+    // Pause auto saat hover
+    stage.addEventListener('mouseenter', () => clearTimeout(autoTimer));
+    stage.addEventListener('mouseleave', scheduleAuto);
+
+    // IntersectionObserver — mulai saat section masuk viewport
+    const qObserver = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                goTo(0, false);
+                scheduleAuto();
+                qObserver.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.3 });
+
+    const qSection = document.getElementById('quotes');
+    if (qSection) qObserver.observe(qSection);
+
+    // Init particles
+    initQuoteParticles();
+
+    console.log('[Quote] Typing engine aktif —', QUOTES.length, 'quotes');
+})();

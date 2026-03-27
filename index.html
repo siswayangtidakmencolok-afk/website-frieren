@@ -93,6 +93,7 @@
         </div>
     </section>
 
+
 <!-- ============================================================
 SPELL COLLECTION SECTION
 Taruh SETELAH <section class="image-slider-section"> dan SEBELUM <section class="characters-section">
@@ -843,6 +844,92 @@ Taruh SETELAH <section class="image-slider-section"> dan SEBELUM <section class=
 
     </div><!-- end char-showcase -->
 </section>
+
+<!-- ============================================================
+TYPING QUOTE SECTION — "Kata-kata yang Membekas"
+Taruh SETELAH gallery-section dan SEBELUM video-section
+(atau di mana pun lo mau antara section yang ada)
+============================================================ -->
+
+<section class="quote-section" id="quotes">
+
+    <!-- Partikel ambient background -->
+    <canvas class="quote-particles-canvas" id="quoteParticles"></canvas>
+
+    <div class="quote-wrapper">
+
+        <!-- Header -->
+        <div class="quote-header">
+            <p class="cs-eyebrow">✦ Kata yang Membekas</p>
+            <h2 class="section-title">Suara dari Perjalanan</h2>
+        </div>
+
+        <!-- Quote display -->
+        <div class="quote-stage" id="quoteStage">
+
+            <!-- Nomor quote -->
+            <div class="quote-index">
+                <span id="quoteCurrentNum">01</span>
+                <span class="qi-sep"></span>
+                <span id="quoteTotalNum">07</span>
+            </div>
+
+            <!-- Karakter sumber -->
+            <div class="quote-char-row" id="quoteCharRow">
+                <div class="quote-char-avatar">
+                    <img id="quoteCharImg" src="" alt="" onerror="this.style.display='none'">
+                    <div class="qca-fallback" id="qcaFallback"></div>
+                </div>
+                <div class="quote-char-info">
+                    <span class="qci-name" id="quoteCharName"></span>
+                    <span class="qci-role" id="quoteCharRole"></span>
+                </div>
+            </div>
+
+            <!-- Tanda kutip dekoratif -->
+            <div class="quote-mark-open">"</div>
+
+            <!-- Teks quote — diketik JS -->
+            <p class="quote-text" id="quoteText">
+                <span class="qt-typed" id="qtTyped"></span>
+                <span class="qt-cursor" id="qtCursor">|</span>
+            </p>
+
+            <div class="quote-mark-close">"</div>
+
+            <!-- Konteks episode -->
+            <div class="quote-context" id="quoteContext"></div>
+
+            <!-- Refleksi singkat -->
+            <p class="quote-reflection" id="quoteReflection"></p>
+
+        </div>
+
+        <!-- Controls -->
+        <div class="quote-controls">
+            <button class="qc-btn qc-prev" id="quotePrev" aria-label="Quote sebelumnya">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+
+            <!-- Dots -->
+            <div class="quote-dots" id="quoteDots"></div>
+
+            <button class="qc-btn qc-next" id="quoteNext" aria-label="Quote berikutnya">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+        </div>
+
+        <!-- Replay -->
+        <button class="qc-replay" id="quoteReplay">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.51"/></svg>
+            Putar Ulang
+        </button>
+
+    </div>
+</section>
+<!-- ============================================================
+END QUOTE SECTION
+============================================================ -->
 
 <!-- ============================================================
     SECTION BARU: KENANGAN HIMMEL — TIMELINE EMOSIONAL
