@@ -1667,7 +1667,7 @@ console.log('⌨  Arrow keys: navigate character slider');
         pointerEvents: 'none',
         zIndex: '9999',
         mixBlendMode: 'screen',
-        opacity: '0.9'
+        opacity: '0.5' // Lower opacity for elegance and less visual noise
     });
     document.body.appendChild(canvas);
     
@@ -1690,24 +1690,24 @@ console.log('⌨  Arrow keys: navigate character slider');
         scrollSpeed = newScroll - scrollY;
         scrollY = newScroll;
         
-        // Peluang muncul bintang jatuh sangat besar saat scroll kencang
-        if (Math.abs(scrollSpeed) > 15 && Math.random() > 0.4) {
+        // Peluang muncul bintang jatuh sangat jarang & butuh scroll yang sangat kencang
+        if (Math.abs(scrollSpeed) > 40 && Math.random() > 0.95) {
             spawnShootingStar();
         }
     });
 
     function spawnShootingStar() {
-        if (shootingStars.length > 4) return;
+        if (shootingStars.length > 1) return; // Max 1-2 komet agar sangat spesial
         const isUp = scrollSpeed > 0;
         shootingStars.push({
             x: Math.random() * W * 1.5 - W * 0.2, 
             y: isUp ? -50 : H + 50,
-            vx: (Math.random() * 8 + 12) * (Math.random() > 0.5 ? 1 : -1), 
-            vy: isUp ? (Math.random() * 10 + 18) : -(Math.random() * 10 + 18),
+            vx: (Math.random() * 8 + 15) * (Math.random() > 0.5 ? 1 : -1), 
+            vy: isUp ? (Math.random() * 10 + 20) : -(Math.random() * 10 + 20),
             life: 1,
-            maxLife: 30 + Math.random() * 20,
-            size: 1.5 + Math.random() * 2,
-            hue: 180 + Math.random() * 50
+            maxLife: 40 + Math.random() * 20,
+            size: 0.8 + Math.random() * 1.2, // Lebih kecil & elegan
+            hue: 180 + Math.random() * 40
         });
     }
 
@@ -1715,15 +1715,15 @@ console.log('⌨  Arrow keys: navigate character slider');
         constructor() {
             this.x = Math.random() * W;
             this.y = Math.random() * H;
-            this.size = Math.random() * 2 + 1;
-            this.vx = (Math.random() - 0.5) * 0.4;
-            this.vy = -Math.random() * 0.5 - 0.2;
+            this.size = Math.random() * 1.5 + 0.5; // Partikel lebih kecil
+            this.vx = (Math.random() - 0.5) * 0.2;
+            this.vy = -Math.random() * 0.3 - 0.1;
             this.hue = 180 + Math.random() * 50; 
-            this.baseAlpha = 0.2 + Math.random() * 0.6;
+            this.baseAlpha = 0.1 + Math.random() * 0.3; // Lebih transparan
         }
         update() {
             this.y -= scrollSpeed * (0.05 + this.size * 0.05);
-            this.x += this.vx - scrollSpeed * 0.02 * (this.x > W/2 ? 1 : -1); 
+            this.x += this.vx - scrollSpeed * 0.01 * (this.x > W/2 ? 1 : -1); 
             this.y += this.vy;
 
             if (this.y < -100) this.y = H + 50;
@@ -1732,16 +1732,16 @@ console.log('⌨  Arrow keys: navigate character slider');
             if (this.x > W + 50) this.x = -50;
         }
         draw(ctx) {
-            const stretchY = Math.max(1, Math.abs(scrollSpeed * 0.15));
-            const stretchX = Math.abs(scrollSpeed * 0.03);
+            const stretchY = Math.max(1, Math.abs(scrollSpeed * 0.1));
+            const stretchX = Math.abs(scrollSpeed * 0.02);
 
             if (stretchY > 1.5) {
                 ctx.beginPath();
                 ctx.moveTo(this.x, this.y);
-                const endY = this.y + (scrollSpeed > 0 ? stretchY * 8 : -stretchY * 8);
-                const endX = this.x + (this.x > W/2 ? stretchX * 8 : -stretchX * 8);
+                const endY = this.y + (scrollSpeed > 0 ? stretchY * 5 : -stretchY * 5);
+                const endX = this.x + (this.x > W/2 ? stretchX * 5 : -stretchX * 5);
                 ctx.lineTo(endX, endY);
-                ctx.strokeStyle = `hsla(${this.hue}, 100%, 75%, Math.min(0.8, stretchY/5))`;
+                ctx.strokeStyle = `hsla(${this.hue}, 100%, 75%, Math.min(0.5, stretchY/10))`;
                 ctx.lineWidth = this.size;
                 ctx.lineCap = 'round';
                 ctx.stroke();
@@ -1749,7 +1749,7 @@ console.log('⌨  Arrow keys: navigate character slider');
                 ctx.save();
                 ctx.translate(this.x, this.y);
                 ctx.fillStyle = `hsla(${this.hue}, 100%, 75%, ${this.baseAlpha})`;
-                ctx.shadowBlur = 10;
+                ctx.shadowBlur = 5;
                 ctx.shadowColor = `hsl(${this.hue}, 100%, 75%)`;
                 
                 ctx.beginPath();
@@ -1764,12 +1764,13 @@ console.log('⌨  Arrow keys: navigate character slider');
         }
     }
 
-    for (let i = 0; i < 45; i++) {
+    // Hanya 12 partikel (sangat ringan, elegan, tidak norak)
+    for (let i = 0; i < 12; i++) {
         particles.push(new MagicDust());
     }
 
     function animate() {
-        scrollSpeed *= 0.88;
+        scrollSpeed *= 0.85; // Dampening lebih halus
         
         ctx.clearRect(0, 0, W, H);
         
@@ -1784,9 +1785,9 @@ console.log('⌨  Arrow keys: navigate character slider');
             ctx.beginPath();
             ctx.moveTo(star.x, star.y);
             let tailLen = star.maxLife - star.life;
-            ctx.lineTo(star.x - star.vx * tailLen * 0.15, star.y - star.vy * tailLen * 0.15);
-            let grad = ctx.createLinearGradient(star.x, star.y, star.x - star.vx * tailLen * 0.15, star.y - star.vy * tailLen * 0.15);
-            grad.addColorStop(0, `hsla(${star.hue}, 100%, 85%, 1)`);
+            ctx.lineTo(star.x - star.vx * tailLen * 0.1, star.y - star.vy * tailLen * 0.1);
+            let grad = ctx.createLinearGradient(star.x, star.y, star.x - star.vx * tailLen * 0.1, star.y - star.vy * tailLen * 0.1);
+            grad.addColorStop(0, `hsla(${star.hue}, 100%, 85%, 0.8)`);
             grad.addColorStop(1, `hsla(${star.hue}, 100%, 85%, 0)`);
             ctx.strokeStyle = grad;
             ctx.lineWidth = star.size;
@@ -1794,15 +1795,15 @@ console.log('⌨  Arrow keys: navigate character slider');
             ctx.stroke();
 
             ctx.beginPath();
-            ctx.arc(star.x, star.y, star.size * 1.5, 0, Math.PI*2);
+            ctx.arc(star.x, star.y, star.size * 1.2, 0, Math.PI*2);
             ctx.fillStyle = '#ffffff';
-            ctx.shadowBlur = 20;
+            ctx.shadowBlur = 10;
             ctx.shadowColor = `hsl(${star.hue}, 100%, 80%)`;
             ctx.fill();
             ctx.shadowBlur = 0;
 
             star.x += star.vx;
-            star.y += star.vy + (scrollSpeed * 0.4);
+            star.y += star.vy + (scrollSpeed * 0.2);
             star.life++;
 
             if (star.life >= star.maxLife || star.x < -100 || star.x > W+100 || star.y < -100 || star.y > H+100) {
@@ -1814,5 +1815,5 @@ console.log('⌨  Arrow keys: navigate character slider');
     }
     
     animate();
-    console.log('✨ Particle Sihir Frieren & Bintang Jatuh Aktif (Scroll Effect)');
+    console.log('✨ Particle Sihir & Bintang Jatuh Aktif (Elegan & Ringan)');
 })();
