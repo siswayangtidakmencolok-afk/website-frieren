@@ -1578,57 +1578,88 @@ console.log('⌨  Arrow keys: navigate character slider');
 })();
 
 // ──────────────────────────────────────────────────────────────
-// 18. SPELL CAROUSEL LOGIC & DRAG TO SCROLL
+// 18. 3D GRIMOIRE BOOK LOGIC
 // ──────────────────────────────────────────────────────────────
-(function initSpellCarousel() {
-    const spellGrid = document.getElementById('spellsGrid');
-    const spellPrev = document.getElementById('spellPrev');
-    const spellNext = document.getElementById('spellNext');
+(function initGrimoireBook() {
+    const book = document.getElementById('grimoireBook');
+    const prevBtn = document.getElementById('bookPrev');
+    const nextBtn = document.getElementById('bookNext');
+    if (!book) return;
 
-    if (!spellGrid) return;
+    const pages = book.querySelectorAll('.book-page');
+    let currentPage = 0; // Mulai dari sampul depan
 
-    let isDown = false;
-    let startX;
-    let scrollLeft;
+    function updateBook() {
+        // Jika sedang di cover depan / belakang, jangan geser tengah
+        if (currentPage === 0 || currentPage === pages.length) {
+            book.classList.remove('open');
+        } else {
+            book.classList.add('open');
+        }
 
-    spellGrid.addEventListener('mousedown', (e) => {
-        isDown = true;
-        spellGrid.style.cursor = 'grabbing';
-        spellGrid.style.scrollSnapType = 'none';
-        startX = e.pageX - spellGrid.offsetLeft;
-        scrollLeft = spellGrid.scrollLeft;
-    });
-
-    spellGrid.addEventListener('mouseleave', () => {
-        isDown = false;
-        spellGrid.style.cursor = 'grab';
-        spellGrid.style.scrollSnapType = 'x mandatory';
-    });
-
-    spellGrid.addEventListener('mouseup', () => {
-        isDown = false;
-        spellGrid.style.cursor = 'grab';
-        spellGrid.style.scrollSnapType = 'x mandatory';
-    });
-
-    spellGrid.addEventListener('mousemove', (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        const x = e.pageX - spellGrid.offsetLeft;
-        const walk = (x - startX) * 1.5;
-        spellGrid.scrollLeft = scrollLeft - walk;
-    });
-
-    if (spellPrev && spellNext) {
-        spellPrev.addEventListener('click', () => {
-            const cardWidth = spellGrid.querySelector('.spell-card')?.offsetWidth || 300;
-            spellGrid.scrollBy({ left: -(cardWidth + 24), behavior: 'smooth' });
-        });
-        spellNext.addEventListener('click', () => {
-            const cardWidth = spellGrid.querySelector('.spell-card')?.offsetWidth || 300;
-            spellGrid.scrollBy({ left: cardWidth + 24, behavior: 'smooth' });
+        pages.forEach((page, index) => {
+            if (index < currentPage) {
+                // Halaman diputar ke kiri
+                page.classList.add('flipped');
+                // z-index kecil di kiri (karena stack terbalik)
+                page.style.zIndex = index;
+            } else {
+                // Halaman di sebelah kanan belum diputar
+                page.classList.remove('flipped');
+                // z-index besar di kanan (teratas)
+                page.style.zIndex = pages.length - index;
+            }
         });
     }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < pages.length) {
+                currentPage++;
+                updateBook();
+            }
+        });
+    }
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 0) {
+                currentPage--;
+                updateBook();
+            }
+        });
+    }
+
+    // Klik area kosong pada kertas untuk membalik halaman
+    pages.forEach((page, index) => {
+        const front = page.querySelector('.page-front');
+        if (front) {
+            front.addEventListener('click', (e) => {
+                // Abaikan klik flip halaman jika yang diklik adalah spell-card (agar hanya kartu yg terbuka/terbalik)
+                if (e.target.closest('.spell-card')) return;
+                
+                if (currentPage === index) {
+                    currentPage++;
+                    updateBook();
+                }
+            });
+        }
+        
+        const back = page.querySelector('.page-back');
+        if (back) {
+            back.addEventListener('click', (e) => {
+                if (e.target.closest('.spell-card')) return;
+
+                if (currentPage === index + 1) {
+                    currentPage--;
+                    updateBook();
+                }
+            });
+        }
+    });
+
+    // Inisialisasi posisi awal 3D
+    updateBook();
 })();
 
 // ──────────────────────────────────────────────────────────────
