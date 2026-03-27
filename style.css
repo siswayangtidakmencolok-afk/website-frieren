@@ -2348,29 +2348,88 @@ SPELL COLLECTION — FIXED CSS
     flex-shrink: 0;
 }
 
-/* ── Spell Grid ── */
-.spells-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
+/* ── Spell Slider Container ── */
+.spells-slider-wrap {
+    position: relative;
+    max-width: 100%;
     margin-bottom: 2.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.spell-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(94, 236, 255, 0.3);
+    color: #5eecff;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    z-index: 10;
+    transition: all 0.3s ease;
+    display: flex; /* Always visible for easy nav */
+    align-items: center;
+    justify-content: center;
+}
+
+.spell-nav-btn:hover {
+    background: rgba(94, 236, 255, 0.2);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.spell-prev { left: -20px; }
+.spell-next { right: -20px; }
+
+@media (max-width: 1024px) {
+    .spell-prev { left: -5px; }
+    .spell-next { right: -5px; }
+}
+
+/* ── Spell Grid (Carousel) ── */
+.spells-grid {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+    padding: 1rem 0 2rem;
+    scroll-behavior: smooth;
+    width: 100%;
+}
+.spells-grid::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
 }
 
 /* ── Individual Card ── */
 .spell-card {
+    flex: 0 0 calc(33.333% - 1rem);
+    scroll-snap-align: center;
     perspective: 1000px;
-    height: 340px;
+    height: 380px;
     cursor: pointer;
-    /* FIXED: tidak ada opacity:0 di sini — pakai class reveal */
     opacity: 0;
     transform: translateY(30px);
     transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-/* FIXED: reveal class dari JS */
+/* Reveal class dari JS */
 .spell-card.spell-visible {
     opacity: 1;
     transform: translateY(0);
+}
+
+@media (max-width: 900px) {
+    .spell-card { flex: 0 0 calc(50% - 0.75rem); }
+}
+
+@media (max-width: 600px) {
+    .spell-card { flex: 0 0 85%; }
 }
 
 .sc-inner {
