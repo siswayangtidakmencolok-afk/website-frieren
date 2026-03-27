@@ -1576,3 +1576,243 @@ console.log('⌨  Arrow keys: navigate character slider');
     animate();
     console.log('✨ Efek Mana Release (Aura Frieren) aktif');
 })();
+
+// ──────────────────────────────────────────────────────────────
+// 18. SPELL CAROUSEL LOGIC & DRAG TO SCROLL
+// ──────────────────────────────────────────────────────────────
+(function initSpellCarousel() {
+    const spellGrid = document.getElementById('spellsGrid');
+    const spellPrev = document.getElementById('spellPrev');
+    const spellNext = document.getElementById('spellNext');
+
+    if (!spellGrid) return;
+
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    spellGrid.addEventListener('mousedown', (e) => {
+        isDown = true;
+        spellGrid.style.cursor = 'grabbing';
+        spellGrid.style.scrollSnapType = 'none';
+        startX = e.pageX - spellGrid.offsetLeft;
+        scrollLeft = spellGrid.scrollLeft;
+    });
+
+    spellGrid.addEventListener('mouseleave', () => {
+        isDown = false;
+        spellGrid.style.cursor = 'grab';
+        spellGrid.style.scrollSnapType = 'x mandatory';
+    });
+
+    spellGrid.addEventListener('mouseup', () => {
+        isDown = false;
+        spellGrid.style.cursor = 'grab';
+        spellGrid.style.scrollSnapType = 'x mandatory';
+    });
+
+    spellGrid.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - spellGrid.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        spellGrid.scrollLeft = scrollLeft - walk;
+    });
+
+    if (spellPrev && spellNext) {
+        spellPrev.addEventListener('click', () => {
+            const cardWidth = spellGrid.querySelector('.spell-card')?.offsetWidth || 300;
+            spellGrid.scrollBy({ left: -(cardWidth + 24), behavior: 'smooth' });
+        });
+        spellNext.addEventListener('click', () => {
+            const cardWidth = spellGrid.querySelector('.spell-card')?.offsetWidth || 300;
+            spellGrid.scrollBy({ left: cardWidth + 24, behavior: 'smooth' });
+        });
+    }
+})();
+
+// ──────────────────────────────────────────────────────────────
+// 19. MAGNETIC BUTTON HOVER EFFECT
+// ──────────────────────────────────────────────────────────────
+(function initMagneticButtons() {
+    const magnets = document.querySelectorAll('.rn-btn, .spell-nav-btn, .btn-mal, .char-tab');
+    magnets.forEach(btn => {
+        btn.addEventListener('mousemove', (e) => {
+            const rect = btn.getBoundingClientRect();
+            const h = rect.width / 2;
+            const x = e.clientX - rect.left - h;
+            const y = e.clientY - rect.top - h;
+            btn.style.transform = `translate(${x * 0.25}px, ${y * 0.25}px)`;
+        });
+        btn.addEventListener('mouseleave', () => {
+            btn.style.transform = `translate(0px, 0px)`;
+            btn.style.transition = `transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)`;
+        });
+        btn.addEventListener('mouseenter', () => {
+            btn.style.transition = `none`;
+        });
+    });
+})();
+
+// ──────────────────────────────────────────────────────────────
+// 20. BINTANG JATUH & PARTIKEL SIHIR FRIEREN (Scroll Effect)
+// ──────────────────────────────────────────────────────────────
+(function initGlobalScrollMagic() {
+    const canvas = document.createElement('canvas');
+    Object.assign(canvas.style, {
+        position: 'fixed',
+        inset: '0',
+        width: '100vw',
+        height: '100vh',
+        pointerEvents: 'none',
+        zIndex: '9999',
+        mixBlendMode: 'screen',
+        opacity: '0.9'
+    });
+    document.body.appendChild(canvas);
+    
+    const ctx = canvas.getContext('2d');
+    let W, H;
+    let particles = [];
+    let shootingStars = [];
+    let scrollY = window.scrollY;
+    let scrollSpeed = 0;
+
+    function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    window.addEventListener('scroll', () => {
+        const newScroll = window.scrollY;
+        scrollSpeed = newScroll - scrollY;
+        scrollY = newScroll;
+        
+        // Peluang muncul bintang jatuh sangat besar saat scroll kencang
+        if (Math.abs(scrollSpeed) > 15 && Math.random() > 0.4) {
+            spawnShootingStar();
+        }
+    });
+
+    function spawnShootingStar() {
+        if (shootingStars.length > 4) return;
+        const isUp = scrollSpeed > 0;
+        shootingStars.push({
+            x: Math.random() * W * 1.5 - W * 0.2, 
+            y: isUp ? -50 : H + 50,
+            vx: (Math.random() * 8 + 12) * (Math.random() > 0.5 ? 1 : -1), 
+            vy: isUp ? (Math.random() * 10 + 18) : -(Math.random() * 10 + 18),
+            life: 1,
+            maxLife: 30 + Math.random() * 20,
+            size: 1.5 + Math.random() * 2,
+            hue: 180 + Math.random() * 50
+        });
+    }
+
+    class MagicDust {
+        constructor() {
+            this.x = Math.random() * W;
+            this.y = Math.random() * H;
+            this.size = Math.random() * 2 + 1;
+            this.vx = (Math.random() - 0.5) * 0.4;
+            this.vy = -Math.random() * 0.5 - 0.2;
+            this.hue = 180 + Math.random() * 50; 
+            this.baseAlpha = 0.2 + Math.random() * 0.6;
+        }
+        update() {
+            this.y -= scrollSpeed * (0.05 + this.size * 0.05);
+            this.x += this.vx - scrollSpeed * 0.02 * (this.x > W/2 ? 1 : -1); 
+            this.y += this.vy;
+
+            if (this.y < -100) this.y = H + 50;
+            if (this.y > H + 100) this.y = -50;
+            if (this.x < -50) this.x = W + 50;
+            if (this.x > W + 50) this.x = -50;
+        }
+        draw(ctx) {
+            const stretchY = Math.max(1, Math.abs(scrollSpeed * 0.15));
+            const stretchX = Math.abs(scrollSpeed * 0.03);
+
+            if (stretchY > 1.5) {
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                const endY = this.y + (scrollSpeed > 0 ? stretchY * 8 : -stretchY * 8);
+                const endX = this.x + (this.x > W/2 ? stretchX * 8 : -stretchX * 8);
+                ctx.lineTo(endX, endY);
+                ctx.strokeStyle = `hsla(${this.hue}, 100%, 75%, Math.min(0.8, stretchY/5))`;
+                ctx.lineWidth = this.size;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            } else {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.fillStyle = `hsla(${this.hue}, 100%, 75%, ${this.baseAlpha})`;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = `hsl(${this.hue}, 100%, 75%)`;
+                
+                ctx.beginPath();
+                ctx.moveTo(0, -this.size * 1.5);
+                ctx.lineTo(this.size, 0);
+                ctx.lineTo(0, this.size * 1.5);
+                ctx.lineTo(-this.size, 0);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+    }
+
+    for (let i = 0; i < 45; i++) {
+        particles.push(new MagicDust());
+    }
+
+    function animate() {
+        scrollSpeed *= 0.88;
+        
+        ctx.clearRect(0, 0, W, H);
+        
+        particles.forEach(p => {
+            p.update();
+            p.draw(ctx);
+        });
+
+        for (let i = shootingStars.length - 1; i >= 0; i--) {
+            let star = shootingStars[i];
+            
+            ctx.beginPath();
+            ctx.moveTo(star.x, star.y);
+            let tailLen = star.maxLife - star.life;
+            ctx.lineTo(star.x - star.vx * tailLen * 0.15, star.y - star.vy * tailLen * 0.15);
+            let grad = ctx.createLinearGradient(star.x, star.y, star.x - star.vx * tailLen * 0.15, star.y - star.vy * tailLen * 0.15);
+            grad.addColorStop(0, `hsla(${star.hue}, 100%, 85%, 1)`);
+            grad.addColorStop(1, `hsla(${star.hue}, 100%, 85%, 0)`);
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = star.size;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.size * 1.5, 0, Math.PI*2);
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = `hsl(${star.hue}, 100%, 80%)`;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            star.x += star.vx;
+            star.y += star.vy + (scrollSpeed * 0.4);
+            star.life++;
+
+            if (star.life >= star.maxLife || star.x < -100 || star.x > W+100 || star.y < -100 || star.y > H+100) {
+                shootingStars.splice(i, 1);
+            }
+        }
+
+        requestAnimationFrame(animate);
+    }
+    
+    animate();
+    console.log('✨ Particle Sihir Frieren & Bintang Jatuh Aktif (Scroll Effect)');
+})();
