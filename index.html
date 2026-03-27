@@ -52,47 +52,108 @@
 
 <body>
 
-    <section class="hero" id="inicio">
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1 class="hero-title">Frieren</h1>
-                <p class="hero-description">
-                    Penyihir elf yang telah hidup lebih dari seribu tahun. Setelah mengalahkan Raja Iblis bersama kelompok pahlawan, ia memulai perjalanan baru untuk memahami arti sebenarnya dari hubungan manusia.
-                </p>
-                <div class="hero-buttons">
-                    <a href="https://anime-dunya.com/id/anime/52991" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    class="btn-primary btn-watch">
-                    ▶ Tonton Sekarang
-                    </a>
-                    <button class="btn-secondary" id="btnInfoDetail">ℹ Informasi Detail</button>
+<!-- ============================================================
+     CINEMATIC PARALLAX HERO — GANTI SELURUH <section class="hero"> YANG LAMA
+     ============================================================ -->
+
+<section class="hero" id="inicio">
+
+    <!-- Layer 0: Sky background — paling lambat bergerak -->
+    <div class="hero-layer-sky" id="heroLayerSky"></div>
+
+    <!-- Layer 1: Atmospheric fog -->
+    <div class="hero-layer-fog" id="heroLayerFog"></div>
+
+    <!-- Layer 2: Particle canvas -->
+    <canvas class="hero-canvas-layer" id="heroCanvas"></canvas>
+
+    <!-- Aura di belakang karakter -->
+    <div class="hero-char-aura" id="heroCharAura"></div>
+
+    <!-- Layer 3: Character — absolute, bergerak medium speed -->
+    <div class="hero-layer-char" id="heroLayerChar">
+        <img src="images/foto1.jpg" alt="Frieren">
+    </div>
+
+    <!-- Mouse vignette -->
+    <div class="hero-vignette" id="heroVignette"></div>
+
+    <!-- Layer 4: Content teks — paling depan -->
+    <div class="hero-layer-content">
+        <div class="hero-text">
+            <p class="hero-eyebrow">✦ Sōshitsu to Tabi no Monogatari</p>
+            <h1 class="hero-title">Frieren</h1>
+            <p class="hero-subtitle-jp">葬送のフリーレン</p>
+            <p class="hero-description">
+                Penyihir elf yang telah hidup lebih dari seribu tahun.
+                Setelah mengalahkan Raja Iblis bersama kelompok pahlawan,
+                ia memulai perjalanan baru untuk memahami arti sebenarnya
+                dari waktu — dan kenangan yang tak bisa dikembalikan.
+            </p>
+
+            <!-- Metadata strip -->
+            <div class="hero-meta">
+                <div class="hero-meta-item">
+                    <span class="hmi-label">Tahun</span>
+                    <span class="hmi-val">2023</span>
+                </div>
+                <div class="hero-meta-item">
+                    <span class="hmi-label">Episode</span>
+                    <span class="hmi-val">28 Eps</span>
+                </div>
+                <div class="hero-meta-item">
+                    <span class="hmi-label">Studio</span>
+                    <span class="hmi-val">Madhouse</span>
+                </div>
+                <div class="hero-meta-item">
+                    <span class="hmi-label">Skor MAL</span>
+                    <span class="hmi-val">9.0 / 10</span>
                 </div>
             </div>
-            <div class="hero-image">
-                <img src="images/foto1.jpg" alt="Frieren Portrait">
+
+            <div class="hero-buttons">
+                <a href="https://www.bilibili.tv/en/play/2028342"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="btn-primary btn-watch">
+                    <span>▶ Tonton Sekarang</span>
+                </a>
+                <button class="btn-secondary" id="btnInfoDetail">ℹ Informasi Detail</button>
             </div>
         </div>
-        <div class="scroll-indicator">
-            <span>Scroll Ke Bawah</span>
-            <div class="arrow-down"></div>
-        </div>
-    </section>
 
-    <section class="image-slider-section">
-        <div class="slider-container">
-            <div class="slider-track" id="imageSlider">
-                <div class="slide-item"><img src="images/slide1.png" alt="Frieren Artwork 1"></div>
-                <div class="slide-item"><img src="images/slide2.jpg" alt="Frieren Artwork 2"></div>
-                <div class="slide-item"><img src="images/slide3.png" alt="Frieren Artwork 3"></div>
-                <div class="slide-item"><img src="images/slide4.jpg" alt="Frieren Artwork 4"></div>
-                <div class="slide-item"><img src="images/slide5.jpg" alt="Fern Artwork"></div>
-                <div class="slide-item"><img src="images/slide6.jpg" alt="Character Artwork 6"></div>
-                <div class="slide-item"><img src="images/slide7.jpg" alt="Character Artwork 7"></div>
-            </div>
-        </div>
-    </section>
+        <!-- Kanan kosong — karakter ada di absolute layer -->
+        <div></div>
+    </div>
 
+    <!-- Scroll indicator -->
+    <div class="scroll-indicator">
+        <span>Scroll</span>
+        <div class="arrow-down"></div>
+    </div>
+
+</section>
+
+<!-- ============================================================
+END CINEMATIC HERO
+============================================================ -->
+
+<!-- ============================================================
+PREMIUM HERO SLIDER 
+============================================================ -->
+<section class="image-slider-section" id="heroSlider">
+    <div class="slider-container">
+        <div class="slider-track" id="imageSlider">
+            <div class="slide-item"><img src="images/slide1.png" alt="Slide 1"></div>
+            <div class="slide-item"><img src="images/slide2.jpg" alt="Slide 2"></div>
+            <div class="slide-item"><img src="images/slide3.png" alt="Slide 3"></div>
+            <div class="slide-item"><img src="images/slide4.jpg" alt="Slide 4"></div>
+            <div class="slide-item"><img src="images/slide5.jpg" alt="Slide 5"></div>
+            <div class="slide-item"><img src="images/slide6.jpg" alt="Slide 6"></div>
+            <div class="slide-item"><img src="images/slide7.jpg" alt="Slide 7"></div>
+        </div>
+    </div>
+</section>
 
 <!-- ============================================================
 SPELL COLLECTION SECTION
@@ -846,6 +907,39 @@ Taruh SETELAH <section class="image-slider-section"> dan SEBELUM <section class=
 </section>
 
 <!-- ============================================================
+3D SHOWCASE SECTION (THREE.JS + SKETCHFAB)
+============================================================ -->
+<section class="three-showcase" id="interactive3d">
+    <div class="cs-header">
+        <p class="cs-eyebrow">✦ Pengalaman 3D Interaktif</p>
+        <h2 class="section-title">Visualisasi Keajaiban Dunia 3D</h2>
+        <p class="cs-subtitle">Eksplorasi model karakter Frieren dan artefak magis secara interaktif.</p>
+    </div>
+
+    <div class="showcase-grid">
+        <!-- SKETCHFAB EMBED -->
+        <div class="showcase-card sketchfab-card">
+            <h3>Model 3D Frieren</h3>
+            <div class="sketchfab-embed-wrapper sf-embed-container">
+                <iframe title="Frieren" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share src="https://sketchfab.com/models/b2965683a2564ea1998c32d49e6ef4b0/embed"> </iframe>
+                <p class="sf-embed-footer">
+                    <a href="https://sketchfab.com/3d-models/frieren-b2965683a2564ea1998c32d49e6ef4b0" target="_blank" rel="nofollow"> Frieren </a> by 
+                    <a href="https://sketchfab.com/stylo0" target="_blank" rel="nofollow"> stylo0 </a> on 
+                    <a href="https://sketchfab.com" target="_blank" rel="nofollow">Sketchfab</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- THREE.JS PROCEDURAL RELIC -->
+        <div class="showcase-card threejs-card">
+            <h3>Tongkat Sihir & Energi Mana</h3>
+            <p class="card-hint">Geser kursor Anda di area ini</p>
+            <div class="three-canvas-wrap" id="threeCanvasContainer"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
 TYPING QUOTE SECTION — "Kata-kata yang Membekas"
 Taruh SETELAH gallery-section dan SEBELUM video-section
 (atau di mana pun lo mau antara section yang ada)
@@ -1328,6 +1422,7 @@ END QUOTE SECTION
     </div>
 </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
