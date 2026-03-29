@@ -880,8 +880,8 @@ GANTI seluruh blok .hero di style.css dengan ini
 /* Social Media Grid */
 .socmed-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
     margin-bottom: 3.5rem;
 }
 
@@ -909,6 +909,12 @@ GANTI seluruh blok .hero di style.css dengan ini
 .socmed-card[data-platform="tiktok"]:hover    { border-color: #69c9d0; box-shadow: 0 15px 35px rgba(105, 201, 208, 0.2); }
 .socmed-card[data-platform="discord"]:hover   { border-color: #5865f2; box-shadow: 0 15px 35px rgba(88, 101, 242, 0.2); }
 .socmed-card[data-platform="telegram"]:hover  { border-color: #26a5e4; box-shadow: 0 15px 35px rgba(38, 165, 228, 0.2); }
+.socmed-card[data-platform="whatsapp"]:hover  { border-color: #25d366; box-shadow: 0 15px 35px rgba(37, 211, 102, 0.2); }
+.socmed-card[data-platform="email"]:hover     { border-color: #ea4335; box-shadow: 0 15px 35px rgba(234, 67, 53, 0.2); }
+.socmed-card[data-platform="youtube"]:hover   { border-color: #ff0000; box-shadow: 0 15px 35px rgba(255, 0, 0, 0.2); }
+.socmed-card[data-platform="facebook"]:hover  { border-color: #1877f2; box-shadow: 0 15px 35px rgba(24, 119, 242, 0.2); }
+.socmed-card[data-platform="x"]:hover         { border-color: #fff; box-shadow: 0 15px 35px rgba(255, 255, 255, 0.1); }
+.socmed-card[data-platform="gitlab"]:hover    { border-color: #fca121; box-shadow: 0 15px 35px rgba(252, 161, 33, 0.2); }
 
 .socmed-icon {
     width: 52px;
@@ -926,6 +932,12 @@ GANTI seluruh blok .hero di style.css dengan ini
 .socmed-card[data-platform="tiktok"]    .socmed-icon { color: #69c9d0; background: rgba(105, 201, 208, 0.08); }
 .socmed-card[data-platform="discord"]   .socmed-icon { color: #5865f2; background: rgba(88, 101, 242, 0.08); }
 .socmed-card[data-platform="telegram"]  .socmed-icon { color: #26a5e4; background: rgba(38, 165, 228, 0.08); }
+.socmed-card[data-platform="whatsapp"]  .socmed-icon { color: #25d366; background: rgba(37, 211, 102, 0.08); }
+.socmed-card[data-platform="email"]     .socmed-icon { color: #ea4335; background: rgba(234, 67, 53, 0.08); }
+.socmed-card[data-platform="youtube"]   .socmed-icon { color: #ff0000; background: rgba(255, 0, 0, 0.08); }
+.socmed-card[data-platform="facebook"]  .socmed-icon { color: #1877f2; background: rgba(24, 119, 242, 0.08); }
+.socmed-card[data-platform="x"]         .socmed-icon { color: #fff; background: rgba(255, 255, 255, 0.05); }
+.socmed-card[data-platform="gitlab"]    .socmed-icon { color: #fca121; background: rgba(252, 161, 33, 0.08); }
 
 .socmed-label {
     font-size: 0.95rem;
@@ -1388,7 +1400,7 @@ GANTI seluruh blok .hero di style.css dengan ini
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.07);
     border-radius: 18px;
-    overflow: hidden;
+    overflow: visible;
     cursor: pointer;
     /* Efek magis melayang saat terbuka, ringan (GPU Accelerated) */
     transform: translateY(50px) rotateX(-15deg) scale(0.9);
@@ -1459,10 +1471,34 @@ GANTI seluruh blok .hero di style.css dengan ini
     margin-bottom: 0.6rem;
 }
 
-.identity-card[data-char="frieren"] .icard-name { color: #5eecff; }
-.identity-card[data-char="himmel"]  .icard-name { color: #fbbf24; }
-.identity-card[data-char="fern"]    .icard-name { color: #a78bfa; }
-.identity-card[data-char="ubel"]    .icard-name { color: #f87171; }
+.identity-card[data-char="frieren"] .icard-name, .identity-card[data-char="frieren"] .icard-name-link { color: #f4f4f2; }
+.identity-card[data-char="himmel"]  .icard-name, .identity-card[data-char="himmel"]  .icard-name-link { color: #24c2fb; }
+.identity-card[data-char="fern"]    .icard-name, .identity-card[data-char="fern"]    .icard-name-link { color: #6f56bb; }
+.identity-card[data-char="ubel"]    .icard-name, .identity-card[data-char="ubel"]    .icard-name-link { color: #32c63a; }
+
+.icard-name-link {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.icard-name-link:hover {
+    filter: brightness(1.3) drop-shadow(0 0 8px currentColor);
+    transform: translateX(4px);
+}
+
+.icard-name-arrow {
+    font-size: 0.9rem;
+    opacity: 0.5;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.icard-name-link:hover .icard-name-arrow {
+    transform: translate(2px, -2px);
+    opacity: 1;
+}
 
 .icard-desc {
     font-size: 0.78rem;

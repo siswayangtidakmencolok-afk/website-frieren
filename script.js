@@ -748,8 +748,7 @@ class ElectricBorder {
 
         this.canvas = document.createElement('canvas');
         this.canvas.style.cssText = `
-            position:absolute; top:50%; left:50%;
-            transform:translate(-50%,-50%);
+            position:absolute; top:-${this.borderOffset}px; left:-${this.borderOffset}px;
             pointer-events:none; z-index:2; display:block;
         `;
         this.el.appendChild(this.canvas);
@@ -757,12 +756,15 @@ class ElectricBorder {
         this.glowWrap = document.createElement('div');
         this.glowWrap.style.cssText = `position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;`;
 
+        // Strip alpha channel if user provides 8-char hex codes (e.g. #ffffffff) so CSS doesn't break
+        const cleanColor = this.color.length > 7 ? this.color.slice(0, 7) : this.color;
+
         const g1 = document.createElement('div');
-        g1.style.cssText = `position:absolute;inset:0;border-radius:inherit;border:2px solid ${this.color}99;filter:blur(1px);`;
+        g1.style.cssText = `position:absolute;inset:0;border-radius:inherit;border:2px solid ${cleanColor}99;filter:blur(1px);`;
         const g2 = document.createElement('div');
-        g2.style.cssText = `position:absolute;inset:0;border-radius:inherit;border:2px solid ${this.color};filter:blur(4px);`;
+        g2.style.cssText = `position:absolute;inset:0;border-radius:inherit;border:2px solid ${cleanColor};filter:blur(4px);`;
         const bg = document.createElement('div');
-        bg.style.cssText = `position:absolute;inset:0;border-radius:inherit;z-index:-1;transform:scale(1.1);filter:blur(32px);opacity:0.25;background:linear-gradient(-30deg,${this.color},transparent,${this.color}88);`;
+        bg.style.cssText = `position:absolute;inset:0;border-radius:inherit;z-index:-1;transform:scale(1.1);filter:blur(32px);opacity:0.25;background:linear-gradient(-30deg,${cleanColor},transparent,${cleanColor}88);`;
 
         this.glowWrap.append(g1, g2, bg);
         this.el.appendChild(this.glowWrap);
@@ -781,6 +783,8 @@ class ElectricBorder {
         this.canvas.height = h * dpr;
         this.canvas.style.width  = w + 'px';
         this.canvas.style.height = h + 'px';
+        this.canvas.style.top    = `-${bo}px`;
+        this.canvas.style.left   = `-${bo}px`;
         this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         this._w = w; this._h = h;
     }
@@ -795,9 +799,16 @@ class ElectricBorder {
         this.time    += dt * this.speed;
         this.lastTime = now;
 
+        // Auto-fix misaligned borders during CSS grid reflows/lazy loads
+        const currentW = this.el.offsetWidth || 300;
+        const currentH = this.el.offsetHeight || 400;
+        const bo = this.borderOffset;
+        if (this._w !== currentW + bo * 2 || this._h !== currentH + bo * 2) {
+            this._resize();
+        }
+
         const ctx  = this.ctx;
         const dpr  = Math.min(window.devicePixelRatio || 1, 2);
-        const bo   = this.borderOffset;
         const w = this._w, h = this._h;
 
         ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -845,10 +856,11 @@ class ElectricBorder {
 
     setColor(c) {
         this.color = c;
+        const cleanColor = c.length > 7 ? c.slice(0, 7) : c;
         const divs = this.glowWrap.children;
-        if (divs[0]) divs[0].style.border     = `2px solid ${c}99`;
-        if (divs[1]) divs[1].style.border     = `2px solid ${c}`;
-        if (divs[2]) divs[2].style.background = `linear-gradient(-30deg,${c},transparent,${c}88)`;
+        if (divs[0]) divs[0].style.border     = `2px solid ${cleanColor}99`;
+        if (divs[1]) divs[1].style.border     = `2px solid ${cleanColor}`;
+        if (divs[2]) divs[2].style.background = `linear-gradient(-30deg,${cleanColor},transparent,${cleanColor}88)`;
     }
 }
 
