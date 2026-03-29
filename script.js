@@ -651,23 +651,23 @@ function animatePowerBars(panel) {
 // 12. ELECTRIC BORDER on Identity Cards
 // ──────────────────────────────────────────────────────────────
 const CHAR_URLS = {
-    frieren : '#',
-    himmel  : '#',
-    fern    : '#',
-    ubel    : '#',
+    frieren : 'https://vt.tiktok.com/ZSHdkANe7/',
+    himmel  : 'https://youtu.be/SIX-raA25T8?si=jLQ_WVeNtgkQmw0-',
+    fern    : 'https://vt.tiktok.com/ZSHdkgrc2/',
+    ubel    : 'https://missav.ws/dm54/id/miaa-715',
 };
 
 const CHAR_ELECTRIC_COLORS = {
-    frieren : '#5eecff',
-    himmel  : '#fbbf24',
-    fern    : '#a78bfa',
-    ubel    : '#f87171',
+    frieren : '#f4f4f2ff',
+    himmel  : '#24c2fbff',
+    fern    : '#6f56bbff',
+    ubel    : '#32c63aff',
 };
 
 class ElectricBorder {
     constructor(element, options = {}) {
         this.el       = element;
-        this.color    = options.color  || '#5eecff';
+        this.color    = options.color  || '#f4f4f2ff';
         this.speed    = options.speed  || 1;
         this.chaos    = options.chaos  || 0.12;
         this.radius   = options.radius || 18;
@@ -771,11 +771,12 @@ class ElectricBorder {
     }
 
     _resize() {
-        const rect = this.el.getBoundingClientRect();
+        const w_base = this.el.offsetWidth || 300; // Fallback jika belum render
+        const h_base = this.el.offsetHeight || 400;
         const dpr  = Math.min(window.devicePixelRatio || 1, 2);
         const bo   = this.borderOffset;
-        const w    = rect.width  + bo * 2;
-        const h    = rect.height + bo * 2;
+        const w    = w_base + bo * 2;
+        const h    = h_base + bo * 2;
         this.canvas.width  = w * dpr;
         this.canvas.height = h * dpr;
         this.canvas.style.width  = w + 'px';
@@ -857,7 +858,7 @@ class ElectricBorder {
 
     cards.forEach(card => {
         const charKey = card.dataset.char?.toLowerCase();
-        const color   = CHAR_ELECTRIC_COLORS[charKey] || '#5eecff';
+        const color   = CHAR_ELECTRIC_COLORS[charKey] || '#f4f4f2ff';
         let eb = null;
 
         // Lazy init via IntersectionObserver
@@ -878,9 +879,9 @@ class ElectricBorder {
             const url = CHAR_URLS[charKey];
             nameEl.innerHTML = `
                 <a href="${url || '#'}" class="icard-name-link"
-                   target="${url && url !== '#' ? '_blank' : '_self'}"
-                   rel="noopener noreferrer" data-char="${charKey}"
-                   title="Halaman ${txt}">
+                target="${url && url !== '#' ? '_blank' : '_self'}"
+                rel="noopener noreferrer" data-char="${charKey}"
+                title="Halaman ${txt}">
                     ${txt}<span class="icard-name-arrow">↗</span>
                 </a>`;
             nameEl.querySelector('a')?.addEventListener('click', e => {
@@ -907,21 +908,21 @@ function setCharUrl(key, url) {
 const QUOTES = [
     {
         char: 'frieren', name: 'Frieren', role: 'Penyihir Elf · Kelompok Pahlawan',
-        img: 'images/character-frieren.png', color: '#5eecff',
+        img: 'images/character-frieren.png', color: '#f4f4f2ff',
         text: 'Aku baru menyadari... aku tidak pernah benar-benar mengenalnya. Dan sekarang sudah terlambat untuk itu.',
         context: 'Episode 1 · Pemakaman Himmel',
         reflect: 'Satu kalimat yang menggambarkan seluruh inti cerita Frieren — tentang waktu yang berlalu dan penyesalan yang datang terlambat. Bagi elf yang sudah ribuan tahun hidup, sepuluh tahun bersama terasa seperti sekejap. Tapi kematian Himmel membuktikan: panjangnya waktu tidak ada artinya kalau tidak pernah diisi dengan sungguh-sungguh.',
     },
     {
         char: 'himmel', name: 'Himmel', role: 'Pahlawan · Pemimpin Kelompok',
-        img: 'images/character-himmel.png', color: '#fbbf24',
+        img: 'images/character-himmel.png', color: '#24c2fbff',
         text: 'Apakah perlu alasan untuk menolong seseorang? Aku hanya melakukan apa yang memang harus dilakukan.',
         context: 'Sepanjang perjalanan · Filosofi Himmel',
         reflect: 'Himmel tidak pernah menolong karena ingin dikenang. Ia menolong karena menurutnya itu yang benar. Patungnya ada di seluruh dunia bukan karena ia minta, melainkan karena orang-orang yang ia selamatkan tidak punya cara lain untuk berterima kasih.',
     },
     {
         char: 'frieren', name: 'Frieren', role: 'Penyihir Elf · Kelompok Pahlawan',
-        img: 'images/character-frieren.png', color: '#5eecff',
+        img: 'images/character-frieren.png', color: '#f4f4f2ff',
         text: 'Manusia memang makhluk yang aneh. Hanya hidup sebentar, tapi bisa meninggalkan kenangan yang bertahan berabad-abad.',
         context: 'Sepanjang seri · Refleksi Frieren',
         reflect: 'Di sinilah ironi terbesar Frieren — ia yang abadi justru belajar tentang makna hidup dari mereka yang hidupnya paling singkat. Himmel, Heiter, Eisen... mereka sudah tiada, tapi jejak mereka masih membawa Frieren berjalan.',
