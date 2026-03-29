@@ -42,7 +42,19 @@
         targetY = 0.5;
     });
 
+    // ── Intersection Observer (Performance Optimization) ──
+    let isHeroVisible = true;
+    const heroSec = document.getElementById('inicio');
+    if (heroSec) {
+        const heroObs = new IntersectionObserver(e => isHeroVisible = e[0].isIntersecting);
+        heroObs.observe(heroSec);
+    }
+
+    // ── Mouse parallax (Hardware Accelerated) ──
     function tickParallax() {
+        rafId = requestAnimationFrame(tickParallax);
+        if (!isHeroVisible) return; // Prevent calc when off-screen to save battery & cpu
+
         // Lerp smooth
         mouseX += (targetX - mouseX) * 0.06;
         mouseY += (targetY - mouseY) * 0.06;
@@ -50,37 +62,34 @@
         const dx = (mouseX - 0.5);
         const dy = (mouseY - 0.5);
 
-        // Sky — slowest, subtle movement
+        // Sky — slowest, subtle movement (translate3d hardware accelerates)
         if (layerSky) {
-            layerSky.style.transform = `translate(${dx * -18}px, ${dy * -12}px) scale(1.08)`;
+            layerSky.style.transform = `translate3d(${dx * -18}px, ${dy * -12}px, 0) scale(1.08)`;
         }
 
         // Fog — slightly faster
         if (layerFog) {
-            layerFog.style.transform = `translate(${dx * -10}px, ${dy * -7}px)`;
+            layerFog.style.transform = `translate3d(${dx * -10}px, ${dy * -7}px, 0)`;
         }
 
         // Character — medium speed, plus subtle scale breathe
         if (layerChar) {
-            layerChar.style.transform = `translate(${dx * 14}px, ${dy * 8}px)`;
+            layerChar.style.transform = `translate3d(${dx * 14}px, ${dy * 8}px, 0)`;
         }
 
         // Aura — follows char but with more spread
         if (layerAura) {
-            layerAura.style.transform = `translate(${dx * 20}px, ${dy * 14}px)`;
+            layerAura.style.transform = `translate3d(${dx * 20}px, ${dy * 14}px, 0)`;
         }
-
-        rafId = requestAnimationFrame(tickParallax);
     }
     rafId = requestAnimationFrame(tickParallax);
 
     // ── Scroll parallax on top of mouse parallax ──
     window.addEventListener('scroll', () => {
+        if (!isHeroVisible) return;
         const scrollY = window.pageYOffset;
         const heroH   = hero.offsetHeight;
         if (scrollY > heroH) return;
-
-        const progress = scrollY / heroH;
 
         if (layerSky)  layerSky.style.marginTop  = (scrollY * 0.3) + 'px';
         if (layerChar) {
@@ -118,18 +127,16 @@
         };
     }
 
-    let isHeroVisible = true;
-    const heroObs = new IntersectionObserver(e => isHeroVisible = e[0].isIntersecting);
-    const heroSec = document.getElementById('inicio');
-    if(heroSec) heroObs.observe(heroSec);
+    const isMobile = window.innerWidth < 800;
+    const maxParticles = isMobile ? 25 : 60; // Less particles on mobile
 
     function drawParticles() {
         requestAnimationFrame(drawParticles);
-        if (!isHeroVisible) return;
+        if (!isHeroVisible) return; // Prevent canvas draw when off-screen
 
         ctx.clearRect(0, 0, W, H);
 
-        if (particles.length < 60 && Math.random() < 0.4) {
+        if (particles.length < maxParticles && Math.random() < 0.4) {
             particles.push(spawnParticle());
         }
 
@@ -142,14 +149,18 @@
             const progress = p.life / p.maxL;
             const alpha    = Math.sin(progress * Math.PI) * 0.55;
 
-            // Glowing circle
-            const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3);
-            gradient.addColorStop(0, `hsla(${p.hue}, ${p.sat}%, 75%, ${alpha})`);
-            gradient.addColorStop(1, `hsla(${p.hue}, ${p.sat}%, 75%, 0)`);
-
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
-            ctx.fillStyle = gradient;
+            
+            // Render basic circle on mobile to skip heavy createRadialGradient math
+            if (isMobile) {
+                ctx.fillStyle = `hsla(${p.hue}, ${p.sat}%, 75%, ${alpha})`;
+            } else {
+                const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3);
+                gradient.addColorStop(0, `hsla(${p.hue}, ${p.sat}%, 75%, ${alpha})`);
+                gradient.addColorStop(1, `hsla(${p.hue}, ${p.sat}%, 75%, 0)`);
+                ctx.fillStyle = gradient;
+            }
             ctx.fill();
 
             if (p.life >= p.maxL) particles.splice(i, 1);
@@ -163,17 +174,25 @@
     if (charImg) {
         let breatheT = 0;
         function breathe() {
+            requestAnimationFrame(breathe);
+            if (!isHeroVisible) return; // FIX LAG: Do NOT compute heavy CSS filters when scrolling away!
+            
             breatheT += 0.008;
             const scale   = 1 + Math.sin(breatheT) * 0.008;
-            const bright  = 0.85 + Math.sin(breatheT * 1.3) * 0.05;
-            charImg.style.filter    = `brightness(${bright}) saturate(1.1)`;
-            charImg.style.transform = `scale(${scale})`;
-            requestAnimationFrame(breathe);
+            
+            if (isMobile) {
+                // Drop the brightness/saturate filter on mobile, it causes jitter, just scale breathing
+                charImg.style.transform = `scale(${scale})`;
+            } else {
+                const bright  = 0.85 + Math.sin(breatheT * 1.3) * 0.05;
+                charImg.style.filter    = `brightness(${bright}) saturate(1.1)`;
+                charImg.style.transform = `scale(${scale})`;
+            }
         }
         breathe();
     }
 
-    console.log('[Hero] Cinematic parallax aktif');
+    console.log('[Hero] Cinematic Parallax (Mobile Optimized & HW Accelerated) aktif');
 })();
 
 
@@ -1508,7 +1527,8 @@ console.log('⌨  Arrow keys: navigate character slider');
 
     function drawManaFlame() {
         ctx.save();
-        ctx.shadowBlur = 40;
+        /* Kurangi blur di mobile agar tidak lag/jitter saat scroll */
+        ctx.shadowBlur = window.innerWidth < 800 ? 10 : 30;
         ctx.shadowColor = '#5eecff';
         ctx.lineCap = 'round';
 
@@ -1534,7 +1554,7 @@ console.log('⌨  Arrow keys: navigate character slider');
         ctx.translate(W * 0.7, H * 0.5);
         ctx.rotate(-time * 0.3);
 
-        ctx.shadowBlur = 25;
+        ctx.shadowBlur = window.innerWidth < 800 ? 8 : 20;
         ctx.shadowColor = '#a78bfa';
         ctx.strokeStyle = `rgba(167, 139, 250, ${0.2 + Math.sin(time * 2) * 0.1})`;
 
@@ -1589,7 +1609,43 @@ console.log('⌨  Arrow keys: navigate character slider');
     const pages = book.querySelectorAll('.book-page');
     let currentPage = 0; // Mulai dari sampul depan
 
-    function updateBook() {
+    function spawnPageFlipParticles() {
+        // Hanya spawn max 15 elemen ringan, tidak bikin lag
+        const numParticles = 15;
+        const rect = book.getBoundingClientRect();
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        for(let i=0; i < numParticles; i++) {
+            const p = document.createElement('div');
+            p.className = 'book-particle';
+            // Start di tengah buku
+            p.style.left = centerX + 'px';
+            p.style.top = centerY + 'px';
+            
+            // Randomize trajectory
+            const size = Math.random() * 6 + 2;
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+            
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 200 + 50;
+            const dx = Math.cos(angle) * distance;
+            const dy = Math.sin(angle) * distance;
+            
+            p.style.setProperty('--dx', dx + 'px');
+            p.style.setProperty('--dy', dy + 'px');
+            
+            book.appendChild(p);
+            
+            // Cleanup setelah animasi 1 detik
+            setTimeout(() => {
+                p.remove();
+            }, 1000);
+        }
+    }
+
+    function updateBook(isFirstLoad = false) {
         // Jika sedang di cover depan / belakang, jangan geser tengah
         if (currentPage === 0 || currentPage === pages.length) {
             book.classList.remove('open');
@@ -1610,6 +1666,10 @@ console.log('⌨  Arrow keys: navigate character slider');
                 page.style.zIndex = pages.length - index;
             }
         });
+        
+        if (!isFirstLoad) {
+            spawnPageFlipParticles();
+        }
     }
 
     if (nextBtn) {
@@ -1658,8 +1718,8 @@ console.log('⌨  Arrow keys: navigate character slider');
         }
     });
 
-    // Inisialisasi posisi awal 3D
-    updateBook();
+    // Inisialisasi posisi awal 3D tanpa particle
+    updateBook(true);
 })();
 
 // ──────────────────────────────────────────────────────────────

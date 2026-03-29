@@ -2399,13 +2399,37 @@ SPELL COLLECTION — FIXED CSS
 }
 
 @media (max-width: 800px) {
+    .grimoire-wrapper {
+        height: 400px; /* Reduced wrapper height */
+    }
     .grimoire-book {
-        width: 300px;
-        height: 440px;
+        width: 280px;
+        height: 400px;
     }
     .grimoire-book.open {
-        transform: rotateX(10deg) rotateY(0deg) translateX(0) scale(0.9); /* Jangan digeser jika di HP */
+        /* Centering left edge spine */
+        transform: rotateX(8deg) rotateY(0deg) translateX(140px) scale(0.75); 
     }
+}
+
+@media (max-width: 600px) {
+    .grimoire-wrapper {
+        height: 380px;
+        overflow-x: hidden; /* Hide horizontal overflow on mobile to be safe */
+    }
+    .grimoire-book {
+        width: 260px;
+        height: 380px;
+        transform: rotateX(5deg) rotateY(15deg) translateX(0) scale(0.65);
+    }
+    .grimoire-book.open {
+        transform: rotateX(5deg) rotateY(0deg) translateX(130px) scale(0.65); 
+    }
+    .spell-nav-btn {
+        transform: translateY(-50%) scale(0.85);
+    }
+    .spell-prev { left: 0px; }
+    .spell-next { right: 0px; }
 }
 
 /* Halaman-Halaman */
@@ -2529,6 +2553,22 @@ SPELL COLLECTION — FIXED CSS
     font-size: 3rem;
     font-family: serif;
     animation: sealSpin2 10s linear infinite;
+}
+
+/* Magic Particles for Page Turn (DOM Based) */
+.book-particle {
+    position: absolute;
+    border-radius: 50%;
+    background: #5eecff;
+    box-shadow: 0 0 8px #5eecff;
+    pointer-events: none;
+    z-index: 100;
+    animation: bookParticleAnim 1s ease-out forwards;
+}
+
+@keyframes bookParticleAnim {
+    0% { transform: scale(1) translate(0, 0); opacity: 1; }
+    100% { transform: scale(0) translate(var(--dx), var(--dy)); opacity: 0; }
 }
 
 /* ── OVERRIDE SPELL CARD AGAR MASUK KE BUKU ── */
