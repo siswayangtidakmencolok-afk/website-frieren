@@ -52,6 +52,14 @@
 
 <body>
 
+<!-- Magical Cursor Canvas -->
+<canvas id="cursorTrailCanvas" style="position:fixed; top:0; left:0; pointer-events:none; z-index:9999;"></canvas>
+
+<!-- Background Magic Circle -->
+<div class="magic-circle-wrap">
+    <div class="magic-circle"></div>
+</div>
+
 <!-- ============================================================
      CINEMATIC PARALLAX HERO — GANTI SELURUH <section class="hero"> YANG LAMA
      ============================================================ -->
@@ -1119,7 +1127,7 @@ END QUOTE SECTION
         </div>
 
         <!-- Profil Identitas Toggle -->
-        <div class="identity-block">
+        <div class="identity-block reveal-section">
             <button class="identity-toggle" id="identityToggle" aria-expanded="false">
                 <span class="toggle-icon">✦</span>
                 <span class="toggle-text">Profil Identitas</span>
@@ -1233,7 +1241,7 @@ END QUOTE SECTION
 
 
     <!-- ===== CONTACT & SUPPORT SECTION ===== -->
-<section class="contact-section" id="contact">
+<section class="contact-section reveal-section" id="contact">
     <div class="contact-wrapper">
 
         <h2 class="section-title">Kontak & Support</h2>

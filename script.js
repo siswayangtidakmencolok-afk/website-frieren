@@ -1961,3 +1961,94 @@ console.log('⌨  Arrow keys: navigate character slider');
     animate();
     console.log('✨ Particle Sihir & Bintang Jatuh Aktif (Elegan & Ringan)');
 })();
+
+// ──────────────────────────────────────────────────────────────
+// 12. NEW PREMIUM EFFECTS: Cursor Trail & Scroll Reveal
+// ──────────────────────────────────────────────────────────────
+(function initPremiumMagicEffects() {
+    // --- 12.1 Magical Cursor Trail ---
+    const canvas = document.getElementById('cursorTrailCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let W, H;
+    let mouse = { x: -100, y: -100 };
+    const particles = [];
+    
+    function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    window.addEventListener('mousemove', e => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+        
+        // Spawn more particles on move
+        for(let i=0; i<3; i++) {
+            particles.push(new CursorParticle(mouse.x, mouse.y));
+        }
+    });
+
+    class CursorParticle {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.vx = (Math.random() - 0.5) * 1.5;
+            this.vy = (Math.random() - 0.5) * 1.5;
+            this.size = Math.random() * 3 + 1;
+            this.life = 1;
+            this.decay = 0.015 + Math.random() * 0.02;
+            this.hue = Math.random() > 0.5 ? 195 : 270; // Cyan or Purple
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life -= this.decay;
+        }
+        draw() {
+            ctx.fillStyle = `hsla(${this.hue}, 100%, 80%, ${this.life})`;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    function animateCursor() {
+        ctx.clearRect(0, 0, W, H);
+        for(let i = particles.length - 1; i >= 0; i--) {
+            particles[i].update();
+            if(particles[i].life <= 0) {
+                particles.splice(i, 1);
+            } else {
+                particles[i].draw();
+            }
+        }
+        requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    // --- 12.2 Scroll Reveal Animation ---
+    const revealOptions = {
+        threshold: 0.15,
+        rootMargin: "0px 0px -50px 0px"
+    };
+
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+                // Optional: stop observing after reveal
+                // revealObserver.unobserve(entry.target);
+            }
+        });
+    }, revealOptions);
+
+    const revealSections = document.querySelectorAll('.reveal-section');
+    revealSections.forEach(section => {
+        revealObserver.observe(section);
+    });
+
+    console.log('🌌 Magical Cursor & Scroll Reveal Aktif (Premium Experience)');
+})();

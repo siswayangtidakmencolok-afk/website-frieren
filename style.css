@@ -490,6 +490,86 @@ GANTI seluruh blok .hero di style.css dengan ini
     transition: transform 0.6s cubic-bezier(0.33, 1, 0.68, 1);
 }
 
+/* ============================================================
+   MAGICAL EFFECTS: CURSOR & BACKGROUND
+   ============================================================ */
+
+#cursorTrailCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 10000;
+}
+
+/* Background Magic Circle */
+.magic-circle-wrap {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px;
+    height: 800px;
+    pointer-events: none;
+    z-index: -1;
+    perspective: 1200px;
+    opacity: 0.15;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.magic-circle {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 1px solid rgba(94, 236, 255, 0.4);
+    box-shadow: 0 0 40px rgba(94, 236, 255, 0.1), inset 0 0 20px rgba(94, 236, 255, 0.1);
+    position: relative;
+    animation: rotate3DPlane 25s linear infinite;
+    transform-style: preserve-3d;
+}
+
+.magic-circle::before,
+.magic-circle::after {
+    content: '';
+    position: absolute;
+    inset: 15%;
+    border-radius: 50%;
+    border: 1px dashed rgba(94, 236, 255, 0.2);
+    animation: rotate3DInverse 15s linear infinite;
+}
+
+.magic-circle::after {
+    inset: 25%;
+    border: 0.5px solid rgba(157, 92, 255, 0.3);
+    animation: rotate3DPlane 40s linear infinite reverse;
+}
+
+@keyframes rotate3DPlane {
+    0% { transform: rotateX(60deg) rotateZ(0deg); }
+    100% { transform: rotateX(60deg) rotateZ(360deg); }
+}
+
+@keyframes rotate3DInverse {
+    0% { transform: rotateZ(360deg); }
+    100% { transform: rotateZ(0deg); }
+}
+
+/* Scroll Reveal Animations */
+.reveal-section {
+    opacity: 0;
+    transform: translateY(50px) scale(0.98);
+    transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-section.revealed {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
 .slide-item img {
     width: 100%;
     height: 100%;
