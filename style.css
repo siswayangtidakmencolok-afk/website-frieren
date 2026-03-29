@@ -3264,7 +3264,7 @@ body {
 .hero-layer-sky {
     position: absolute;
     inset: -15%;
-    background: url('images/foto1.jpg') center / cover no-repeat;
+    background: url('images/background.jpg') center / cover no-repeat;
     will-change: transform;
     z-index: 0;
     transform-origin: center center;
