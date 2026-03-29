@@ -654,7 +654,7 @@ const CHAR_URLS = {
     frieren : 'https://vt.tiktok.com/ZSHdkANe7/',
     himmel  : 'https://youtu.be/SIX-raA25T8?si=jLQ_WVeNtgkQmw0-',
     fern    : 'https://vt.tiktok.com/ZSHdkgrc2/',
-    ubel    : 'https://missav.ws/dm54/id/miaa-715',
+    ubel    : 'https://www.tiktok.com/@edit.akio7/video/7581494109852945684?is_from_webapp=1&sender_device=pc&web_id=7572769552238855698',
 };
 
 const CHAR_ELECTRIC_COLORS = {
@@ -899,6 +899,46 @@ class ElectricBorder {
             nameEl.querySelector('a')?.addEventListener('click', e => {
                 e.stopPropagation();
                 if (!url || url === '#') e.preventDefault();
+            });
+        }
+
+        // Hover video logic
+        const videoWrap = card.querySelector('.icard-video-wrap');
+        const video = videoWrap?.querySelector('video');
+
+        if (video) {
+            // Desktop hover
+            card.addEventListener('mouseenter', () => {
+                video.currentTime = 0;
+                const playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log("Auto-play was prevented. Interaction may be required.");
+                    });
+                }
+            });
+
+            card.addEventListener('mouseleave', () => {
+                video.pause();
+                video.currentTime = 0;
+            });
+
+            // Mobile tap support (toggle playback)
+            card.addEventListener('click', (e) => {
+                // If the click is on the name link, don't toggle video
+                if (e.target.closest('.icard-name-link')) return;
+
+                if (video.paused) {
+                    // Stop other playing videos first
+                    document.querySelectorAll('.icard-video-wrap video').forEach(v => {
+                        v.pause();
+                        v.currentTime = 0;
+                    });
+                    video.play();
+                } else {
+                    video.pause();
+                    video.currentTime = 0;
+                }
             });
         }
     });
