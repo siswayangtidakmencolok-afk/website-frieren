@@ -50,12 +50,10 @@
 </div>
 <!-- ===== END MODAL ===== -->
 
-<body>
-
 <!-- Magical Cursor Canvas -->
 <canvas id="cursorTrailCanvas" style="position:fixed; top:0; left:0; pointer-events:none; z-index:9999;"></canvas>
 
-<!-- Background Magic Circle -->
+<!-- Background Magic Circle Simplified -->
 <div class="magic-circle-wrap">
     <div class="magic-circle"></div>
 </div>
@@ -72,8 +70,8 @@
     <!-- Layer 1: Atmospheric fog -->
     <div class="hero-layer-fog" id="heroLayerFog"></div>
 
-    <!-- Layer 2: Particle canvas -->
-    <canvas class="hero-canvas-layer" id="heroCanvas"></canvas>
+    <!-- Layer 2: Particle canvas REMOVED for Performance -->
+    <!-- <canvas class="hero-canvas-layer" id="heroCanvas"></canvas> -->
 
     <!-- Aura di belakang karakter -->
     <div class="hero-char-aura" id="heroCharAura"></div>
@@ -83,8 +81,8 @@
         <img src="images/background1.jpg" alt="Frieren">
     </div>
 
-    <!-- Mouse vignette -->
-    <div class="hero-vignette" id="heroVignette"></div>
+    <!-- Mouse vignette REMOVED for Performance -->
+    <!-- <div class="hero-vignette" id="heroVignette"></div> -->
 
     <!-- Layer 4: Content teks — paling depan -->
     <div class="hero-layer-content">
@@ -1127,7 +1125,7 @@ END QUOTE SECTION
         </div>
 
         <!-- Profil Identitas Toggle -->
-        <div class="identity-block reveal-section">
+        <div class="identity-block">
             <button class="identity-toggle" id="identityToggle" aria-expanded="false">
                 <span class="toggle-icon">✦</span>
                 <span class="toggle-text">Profil Identitas</span>
@@ -1241,7 +1239,7 @@ END QUOTE SECTION
 
 
     <!-- ===== CONTACT & SUPPORT SECTION ===== -->
-<section class="contact-section reveal-section" id="contact">
+<section class="contact-section" id="contact">
     <div class="contact-wrapper">
 
         <h2 class="section-title">Kontak & Support</h2>

@@ -40,11 +40,10 @@ GANTI seluruh blok .hero di style.css dengan ini
 /* Layer 0: Sky / deep background (paling lambat) */
 .hero-layer-sky {
     position: absolute;
-    inset: -10%;          /* oversized supaya tidak kosong saat parallax */
+    inset: 0;
     background: url('images/hero-background.png') center / cover no-repeat;
-    transform-origin: center center;
-    will-change: transform;
     z-index: 0;
+    will-change: transform;
 }
 
 /* Layer 1: Atmospheric fog / overlay */
@@ -326,18 +325,9 @@ GANTI seluruh blok .hero di style.css dengan ini
     100% { opacity: 0; transform: scaleY(0.3); transform-origin: top; }
 }
 
-/* Mouse-follow vignette */
+/* Mouse-follow vignette REMOVED FOR PERFORMANCE */
 .hero-vignette {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-        circle 600px at var(--mx, 50%) var(--my, 50%),
-        transparent 0%,
-        rgba(2,2,8,0.15) 100%
-    );
-    z-index: 4;
-    pointer-events: none;
-    transition: background 0.1s linear;
+    display: none;
 }
 
 /* Entry animations */
@@ -470,6 +460,7 @@ GANTI seluruh blok .hero di style.css dengan ini
     visibility: hidden;
     transition: opacity 0.5s ease, visibility 0.5s ease;
     pointer-events: none;
+    will-change: opacity, transform;
 }
 
 .icard-video-wrap video {
@@ -526,10 +517,11 @@ GANTI seluruh blok .hero di style.css dengan ini
     height: 100%;
     border-radius: 50%;
     border: 1px solid rgba(94, 236, 255, 0.4);
-    box-shadow: 0 0 40px rgba(94, 236, 255, 0.1), inset 0 0 20px rgba(94, 236, 255, 0.1);
+    box-shadow: 0 0 20px rgba(94, 236, 255, 0.1);
     position: relative;
     animation: rotate3DPlane 25s linear infinite;
     transform-style: preserve-3d;
+    will-change: transform;
 }
 
 .magic-circle::before,
@@ -558,16 +550,16 @@ GANTI seluruh blok .hero di style.css dengan ini
     100% { transform: rotateZ(0deg); }
 }
 
-/* Scroll Reveal Animations */
+/* Scroll Reveal Animations - Simplified for Visibility Reliability */
 .reveal-section {
-    opacity: 0;
-    transform: translateY(50px) scale(0.98);
-    transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity: 1; /* Default to visible to fix the vanishing bug */
+    transform: none;
+    transition: opacity 0.8s ease;
 }
 
 .reveal-section.revealed {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: none;
 }
 
 .slide-item img {
@@ -1519,15 +1511,17 @@ GANTI seluruh blok .hero di style.css dengan ini
     overflow: visible;
     cursor: pointer;
     /* Efek magis melayang saat terbuka, ringan (GPU Accelerated) */
-    transform: translateY(50px) rotateX(-15deg) scale(0.9);
+    transform: translate3d(0, 50px, 0) rotateX(-15deg) scale(0.9);
     transform-origin: top center;
     opacity: 0;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
     transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.7s ease;
     transition-delay: var(--delay);
 }
 
 .identity-cards.open .identity-card {
-    transform: translateY(0) rotateX(0deg) scale(1);
+    transform: translate3d(0, 0, 0) rotateX(0deg) scale(1);
     opacity: 1;
 }
 
